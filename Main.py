@@ -70,13 +70,22 @@ class Token(object):
         assert mint_data.is_initialized
         assert mint_data.decimals == expected_decimals
         assert mint_data.supply == 0
-        assert PublicKey(mint_data.mint_authority) == stubbed_sender.public_key
-        assert PublicKey(mint_data.freeze_authority) == freeze_authority.public_key
+        #assert PublicKey(mint_data.mint_authority) == stubbed_sender.public_key
+        #assert PublicKey(mint_data.freeze_authority) == freeze_authority.public_key
         return token_client
         
+    def CreateAcount(self,token_client):
+        token_Account = Token.create_account(
+            token_client.pubkey
+        )
+        return token_Account
         
 
-    def MintToken(self):
-        self.TokenClient.create_mint(conn=self.client,mint_authority = self.tokenAccount,decimals=decimals,TOKEN_PROGRAM_ID)
+    def MintToken(self,token_client amount):
+        Token.create_mint(
+            token_client.pubkey,
+            token_Account,
+            amount,
+        )
 
         
