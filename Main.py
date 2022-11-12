@@ -31,7 +31,7 @@ class Token(object):
         self.Main_api_endpoint="https://api.mainnet-beta.safecoin.org"
         self.Test_api_endpoint="https://api.testnet.safecoin.org"
         self.Dev_api_endpoint="https://api.devnet.safecoin.org"
-        self.api_endpoint = self.Main_api_endpoint
+        self.api_endpoint = self.Dev_api_endpoint
         self.keypair = ""
         self.top = tkinter.Tk()
         self.wallet_connected = False
@@ -61,19 +61,21 @@ class Token(object):
 
     def walletNew(self):
         self.keypair = Keypair()
+        print(self.keypair.getattr())
         print(self.keypair.seed)
         print(self.keypair.public_key)
-        with open('KeyPair.json', 'w') as file:
-            file.write(str(self.keypair))
-        self.client = Client(self.api_endpoint)
+        print(int.from_bytes(self.keypair.seed, "little"))
+        #with open('KeyPair.json', 'w') as file:
+        #    file.write(self.keypair.seed)
+        #self.client = Client(self.api_endpoint)
         self.HomePage()
 
     def WalletConnect(self):
         with open('KeyPair.json', 'r') as KP:
-            self.keypair = KP.read()
-        print(self.keypair)
-        walletbytes = bytes(Wallet_Address)
-        self.keypair = Keypair(walletbytes)
+            self.keypairStr = KP.read()
+        print(self.keypairStr)
+        self.keypair = Keypair(self.keypairStr)
+        print(self.keypair.seed)
         self.client = Client(self.api_endpoint)
         self.wallet_connected = True
 
