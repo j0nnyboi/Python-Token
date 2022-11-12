@@ -18,21 +18,55 @@ from safecoin.transaction import Transaction
 from spl.token.client import Token
 from spl.token.constants import TOKEN_PROGRAM_ID
 
+
+import tkinter
+from os.path import exists
+
+
+
+
 class Token(object):
 
     def __init__(self):
         self.Main_api_endpoint="https://api.mainnet-beta.safecoin.org"
         self.Test_api_endpoint="https://api.testnet.safecoin.org"
         self.Dev_api_endpoint="https://api.devnet.safecoin.org"
+        self.api_endpoint = self.Main_api_endpoint
         self.keypair = ""
+        self.top = tkinter.Tk()
+        self.wallet_connected = False
+        
+    def Run(self):
+        self.HomePage()
+        while True:
+            self.top.mainloop()
+            
+
+    def HomePage(self):
+        wallet_exists = exists('KeyPair.json')
+        if(self.wallet_connected == False):
+            if(wallet_exists):
+                text ="Wallet Connect"
+                command = self.WalletConnect
+            else:
+                text ="Create Wallet"
+                command = self.walletNew
+            self.wallet = tkinter.Button(self.top, text =text, command = command)
+            self.wallet.pack()
+        else:
+            self.wallet.config(text=self.keypair.public_key)
+            
+        
+        
 
     def walletNew(self):
         self.keypair = Keypair()
         print(self.keypair.seed)
         print(self.keypair.public_key)
         with open('KeyPair.json', 'w') as file:
-            file.write(self.keypair)
+            file.write(str(self.keypair))
         self.client = Client(self.api_endpoint)
+        self.HomePage()
 
     def WalletConnect(self):
         with open('KeyPair.json', 'r') as KP:
@@ -41,12 +75,10 @@ class Token(object):
         walletbytes = bytes(Wallet_Address)
         self.keypair = Keypair(walletbytes)
         self.client = Client(self.api_endpoint)
+        self.wallet_connected = True
 
 
     def CreateToken(self):
-        name = ""
-        symbol = ""        
-
         expected_decimals = 6
         
         token_client = Token.create_mint(
@@ -81,11 +113,13 @@ class Token(object):
         return token_Account
         
 
-    def MintToken(self,token_client amount):
+    def MintToken(self,token_client, amount):
         Token.create_mint(
             token_client.pubkey,
             token_Account,
             amount,
         )
 
-        
+      
+Token = Token()
+Token.Run()
