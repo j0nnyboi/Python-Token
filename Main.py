@@ -61,20 +61,25 @@ class Token(object):
 
     def walletNew(self):
         self.keypair = Keypair()
-        print(self.keypair.getattr())
+        print([b for b in self.keypair.seed])
+        #print(self.keypair.secret_key)
         print(self.keypair.seed)
         print(self.keypair.public_key)
         print(int.from_bytes(self.keypair.seed, "little"))
-        #with open('KeyPair.json', 'w') as file:
-        #    file.write(self.keypair.seed)
-        #self.client = Client(self.api_endpoint)
+        with open('KeyPair.json', 'w') as file:
+            file.write(str([b for b in self.keypair.seed]))
+            
+        self.client = Client(self.api_endpoint)
         self.HomePage()
 
     def WalletConnect(self):
         with open('KeyPair.json', 'r') as KP:
             self.keypairStr = KP.read()
+        self.keypairStr.replace("]", '')
+        self.keypairStr.replace("[", '')
         print(self.keypairStr)
-        self.keypair = Keypair(self.keypairStr)
+        print(bytes(self.keypairStr))
+        self.keypair = Keypair(bytes(self.keypairStr))
         print(self.keypair.seed)
         self.client = Client(self.api_endpoint)
         self.wallet_connected = True
