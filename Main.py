@@ -53,8 +53,10 @@ class Token(object):
                 command = self.walletNew
             self.wallet = tkinter.Button(self.top, text =text, command = command)
             self.wallet.pack()
+            
         else:
             self.wallet.config(text=self.keypair.public_key)
+        
             
         
         
@@ -74,13 +76,18 @@ class Token(object):
 
     def WalletConnect(self):
         with open('KeyPair.json', 'r') as KP:
-            self.keypairStr = KP.read()
-        self.keypairStr.replace("]", '')
-        self.keypairStr.replace("[", '')
-        print(self.keypairStr)
-        print(bytes(self.keypairStr))
-        self.keypair = Keypair(bytes(self.keypairStr))
+            keypairStr = KP.read()
+        keypairStr = keypairStr.split("[")
+        keypairStr = keypairStr[1].split("]")
+        keypairStr = keypairStr[0].split(",")
+        print(keypairStr)
+        keypairlst = [int(x) for x in keypairStr]
+        
+        #print(self.keypairStr)
+        #print(bytearray(self.keypairStr))
+        self.keypair = Keypair(bytes(keypairlst))
         print(self.keypair.seed)
+        print(self.keypair.public_key)
         self.client = Client(self.api_endpoint)
         self.wallet_connected = True
 
