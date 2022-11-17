@@ -11,10 +11,10 @@ ACCOUNT_LEN: int = 165
 MULTISIG_LEN: int = 355
 """Data length of a multisig token account."""
 
-ASSOCIATED_TOKEN_PROGRAM_ID = PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+ASSOCIATED_TOKEN_PROGRAM_ID = PublicKey("AToD9iqHSc2fhEP9Jp7UYA6mRjHQ4CTWyzCsw8X3tH7K")
 """Program ID for the associated token account program."""
 
-TOKEN_PROGRAM_ID: PublicKey = PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+TOKEN_PROGRAM_ID: PublicKey = PublicKey("ToKLx75MGim1d1jRusuVX8xvdvvbSDESVaNXpRA9PHN")
 """Public key that identifies the SPL token program."""
 
 WRAPPED_SOL_MINT: PublicKey = PublicKey("Safe111111111111111111111111111111111111111")
