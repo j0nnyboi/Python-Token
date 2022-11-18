@@ -63,6 +63,7 @@ class Safecoin_Token(object):
         self.TokenLoadlb = tkinter.Label(self.top, text = "Token Account pubkey:")
         self.DeleteKeybtn = tkinter.Button(self.top, text = "Delete key file", command = self.deleteKey)
         self.GetTokenBalbtn = tkinter.Button(self.top, text = "Get Token Balance", command = self.GetTokenBalance)
+        self.showWalletbtn = tkinter.Button(self.top, text = "Show wallet import", command = self.Showimort)
         self.loadkeyLB = tkinter.Label(self.top, text = "import wallet:")
         
     def Run(self):
@@ -88,6 +89,7 @@ class Safecoin_Token(object):
                 text ="Wallet Connect"
                 command = self.WalletConnect
                 self.DeleteKeybtn.place(x=350, y=50)
+                
             else:
                 text ="Create New Wallet"
                 command = self.walletNew
@@ -95,6 +97,7 @@ class Safecoin_Token(object):
                 self.loadkeyLB.place(x=10, y=100)
                 self.Loadkey.place(x=100, y=100)
                 self.loadkeybtn.place(x=100, y=130)
+                self.showWalletbtn.place_forget()
             
             self.wallet = tkinter.Button(self.top, text =text, command = command)
             self.wallet.place(x=10, y=50)
@@ -115,6 +118,7 @@ class Safecoin_Token(object):
             self.TokenLoadLB.place(x=10, y=170)
             self.TokenLoadBox.place(x=120, y=170)
             self.TokenLoadbtn.place(x=100, y=200)
+            self.showWalletbtn.place(x=10,y=400)
         
     def NetworkChange(self,*args):
         self.Endpoint_selected = self.EndpintVar.get()
@@ -142,6 +146,13 @@ class Safecoin_Token(object):
         os.remove('KeyPair.json')
         self.DeleteKeybtn.place_forget()
         self.HomePage()
+
+    def Showimort(self):
+        secret = [b for b in self.keypair.secret_key]
+        print(secret)
+        self.TokenText.insert(tkinter.END,"use this string to import into wallet.safecoin.org \n")
+        self.TokenText.insert(tkinter.END,"%s \n" % secret)
+        
 
     def walletNew(self):
         self.keypair = Keypair()
