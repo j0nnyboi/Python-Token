@@ -14,14 +14,16 @@ from spl.token.instructions import create_associated_token_account
 from safecoin.rpc.commitment import Confirmed
 from safecoin.rpc.types import TxOpts
 from safecoin.publickey import PublicKey
+from safecoin.system_program import TransferParams, transfer
 from safecoin.transaction import Transaction
 from spl.token.client import Token
 from spl.token.constants import TOKEN_PROGRAM_ID
 
 import os
 import tkinter
+from tkinter.scrolledtext import ScrolledText
 from os.path import exists
-
+import threading
 
 
 
@@ -31,6 +33,7 @@ class Safecoin_Token(object):
 
         self.EndPoint = {"Mainnet":"https://api.mainnet-beta.safecoin.org",
                     "Testnet":"https://api.testnet.safecoin.org",
+                         
                     "Devnet":"https://api.devnet.safecoin.org"}
         self.api_endpoint = self.EndPoint['Mainnet']
         self.Endpoint_selected = 'Mainnet'
@@ -44,7 +47,7 @@ class Safecoin_Token(object):
         self.EndpintVar.set("Mainnet")
         
         self.AirDropBTN = tkinter.Button(self.top, text ='Airdrop 1 safecoin', command = self.airdrop)
-        self.TokenText = tkinter.Text(self.top,height = 20, width = 52)
+        self.TokenText = ScrolledText(self.top,height = 20, width = 52)
         self.TokenText.place(x=450, y=10)
         self.TokenBTN = tkinter.Button(self.top, text = "Create A Token", command = self.CreateToken)
         #self.TokenBTN = tkinter.Button(self.top, text = "Create A Token", command = self.CreateAcount)
@@ -52,7 +55,7 @@ class Safecoin_Token(object):
         self.MintBtn = tkinter.Button(self.top, text = "MINT", command = self.MintToken)
         self.MintAntLB = tkinter.Label(self.top, text = "Mint Amount:")
         self.AmountBox = tkinter.Text(self.top,height = 1, width = 20)
-        self.walletBal = tkinter.Label(self.top, text = "Ballance = 0")
+        self.walletBal = tkinter.Label(self.top, text = "Balance = 0")
         self.TokenLoadBox = tkinter.Text(self.top,height = 1, width = 32)
         self.TokenLoadbtn = tkinter.Button(self.top, text = "Load Token:", command = self.loadToken)
         self.Loadkey = tkinter.Text(self.top,height = 1, width = 32)
@@ -65,11 +68,14 @@ class Safecoin_Token(object):
         self.GetTokenBalbtn = tkinter.Button(self.top, text = "Get Token Balance", command = self.GetTokenBalance)
         self.showWalletbtn = tkinter.Button(self.top, text = "Show wallet import", command = self.Showimort)
         self.loadkeyLB = tkinter.Label(self.top, text = "import wallet:")
+        self.DevFeebtn = tkinter.Button(self.top, text = "Dev Tip 1 safecoin", command = self.DevFee)
+
         
     def Run(self):
         self.HomePage()
         while True:
             self.top.mainloop()
+        
             
     def WalletBal(self):
         if(self.client.is_connected()):
@@ -119,6 +125,7 @@ class Safecoin_Token(object):
             self.TokenLoadBox.place(x=120, y=170)
             self.TokenLoadbtn.place(x=100, y=200)
             self.showWalletbtn.place(x=10,y=400)
+            self.DevFeebtn.place(x=10,y=450)
         
     def NetworkChange(self,*args):
         self.Endpoint_selected = self.EndpintVar.get()
@@ -145,6 +152,28 @@ class Safecoin_Token(object):
     def deleteKey(self):
         os.remove('KeyPair.json')
         self.DeleteKeybtn.place_forget()
+        self.Loadkey.place_forget()
+        self.loadkeybtn.place_forget()
+        self.loadkeyLB.place_forget()
+        self.wallet.place_forget()
+        self.TokenACCBTN.place_forget()
+        self.MintBtn.place_forget()
+        self.MintAntLB.place_forget()
+        self.AmountBox.place_forget()
+        self.walletBal.place_forget()
+        self.TokenLoadBox.place_forget()
+        self.TokenLoadbtn.place_forget()
+        self.Loadkey.place_forget()
+        self.loadkeybtn.place_forget()
+        self.TokenLoadLB.place_forget()
+        self.TokenLoadAccBox.place_forget()
+        self.TokenLoadAccbtn.place_forget()
+        self.TokenLoadlb.place_forget()
+        self.DeleteKeybtn.place_forget()
+        self.GetTokenBalbtn.place_forget()
+        self.showWalletbtn.place_forget()
+        self.loadkeyLB.place_forget()
+        self.DevFeebtn.place_forget()
         self.HomePage()
 
     def Showimort(self):
@@ -152,6 +181,7 @@ class Safecoin_Token(object):
         print(secret)
         self.TokenText.insert(tkinter.END,"use this string to import into wallet.safecoin.org \n")
         self.TokenText.insert(tkinter.END,"%s \n" % secret)
+        self.TokenText.see("end")
         
 
     def walletNew(self):
@@ -193,6 +223,7 @@ class Safecoin_Token(object):
 
     def CreateToken(self):
         self.TokenText.insert(tkinter.END,"Creating a token and waiting for confirmation \n")
+        self.TokenText.see("end")
         self.TokenBTN.place_forget()
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
@@ -219,6 +250,7 @@ class Safecoin_Token(object):
                 amount += 1
                 if(amount > 100):
                     self.TokenText.insert(tkinter.END,"Creating a token Failed Please try again \n")
+                    self.TokenText.see("end")
                     self.TokenBTN.place(x=200, y=200)
                     self.top.update()
                     return
@@ -230,6 +262,7 @@ class Safecoin_Token(object):
         assert self.token_client.payer.public_key == self.keypair.public_key
         assert resp["result"]["value"]["owner"] == str(TOKEN_PROGRAM_ID)
         self.TokenText.insert(tkinter.END,"Token address = %s \n" % self.token_client.pubkey)
+        self.TokenText.see("end")
         self.TokenACCBTN.place(x=10, y=130)
         self.TokenLoadAccBox.place(x=100, y=170)
         self.TokenLoadAccbtn.place(x=100, y=200)
@@ -243,7 +276,7 @@ class Safecoin_Token(object):
         self.token_PubKey = token_PubKey.strip('\n')
         print(self.token_PubKey)
         self.TokenText.insert(tkinter.END,"Loaded Token %s \n" % self.token_PubKey)
-                    
+        self.TokenText.see("end")
         self.TokenACCBTN.place(x=10, y=130)
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
@@ -261,6 +294,7 @@ class Safecoin_Token(object):
         self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
 
         self.TokenText.insert(tkinter.END,"Loaded Token Account %s \n" % self.token_Account)
+        self.TokenText.see("end")
         self.MintAntLB.place(x=10, y=170)
         self.MintBtn.place(x=100, y=200)
         self.AmountBox.place(x=100, y=170)
@@ -291,6 +325,7 @@ class Safecoin_Token(object):
                 amount += 1
                 if(amount > 100):
                     self.TokenText.insert(tkinter.END,"Creating a token Account Failed Please try again \n")
+                    self.TokenText.see("end")
                     self.top.update()
                     return
         print(resp)
@@ -307,6 +342,7 @@ class Safecoin_Token(object):
         self.TokenLoadAccbtn.place_forget()
         self.TokenLoadlb.place_forget()
         self.TokenText.insert(tkinter.END,"Creating a token Account created %s \n" % self.token_Account)
+        self.TokenText.see("end")
         self.top.update()
         return self.token_Account
 
@@ -315,7 +351,12 @@ class Safecoin_Token(object):
         TokenBall = self.TokenACCOUNT.get_balance(pubkey=self.token_Account)
         print(TokenBall)
         self.TokenText.insert(tkinter.END,"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
-        
+
+    def DevFee(self):
+        txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=900000200)))
+        self.client.send_transaction(txn, self.keypair)
+        self.TokenText.insert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs")
+        self.TokenText.see("end")
 
     def MintToken(self, amount = 10):
         amount = int(self.AmountBox.get("1.0",tkinter.END))
@@ -336,11 +377,13 @@ class Safecoin_Token(object):
             else:
                 print("Tokens Failed to mint")
                 self.TokenText.insert(tkinter.END,"Tokens Failed to mint please try again\n")
+                self.TokenText.see("end")
             self.top.update()
                 
         else:
             print("please use just numbers")
             self.TokenText.insert(tkinter.END,"please just use numbers")
+            self.TokenText.see("end")
             self.top.update()
 
     def await_full_confirmation(self,client, txn, max_timeout=60):
@@ -366,6 +409,7 @@ class Safecoin_Token(object):
         resp = {}
         if(self.client.is_connected()):
             self.TokenText.insert(tkinter.END,"Air dropping 1 safe, please wait \n")
+            self.TokenText.see("end")
             self.top.update()
             while 'result' not in resp:
                 resp = self.client.request_airdrop(self.keypair.public_key,1000000000)
@@ -374,10 +418,13 @@ class Safecoin_Token(object):
             print(resp)
             print("Topup complete")
             self.TokenText.insert(tkinter.END,"Air drop completed tx = %s \n" % txn)
+            self.TokenText.see("end")
             self.HomePage()
         else:
             print("not connected to %s"%self.api_endpoint)
 
-      
+
 Safe_Token = Safecoin_Token()
 Safe_Token.Run()
+
+
