@@ -17,7 +17,7 @@ class InstructionType(IntEnum):
     CREATE_METADATA = 0
     UPDATE_METADATA = 1
 
-METADATA_PROGRAM_ID = PublicKey('314JQqufYJpSJQ8fyqb1zGmbko1m18W7QFQzk51Dbm37')
+METADATA_PROGRAM_ID = PublicKey('WbMTNyvtk8vSMu2AmXV7mKuYrADRNw9GSkNtWKsZ7qe')
 SYSTEM_PROGRAM_ID = PublicKey('11111111111111111111111111111111')
 SYSVAR_RENT_PUBKEY = PublicKey('SysvarRent111111111111111111111111111111111') 
 ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = PublicKey('AToD9iqHSc2fhEP9Jp7UYA6mRjHQ4CTWyzCsw8X3tH7K')
@@ -179,7 +179,7 @@ def unpack_metadata_account(data):
 
 def get_metadata(client, mint_key):
     metadata_account = get_metadata_account(mint_key)
-    #print(metadata_account)
+    print("meta: ",metadata_account)
     data = base64.b64decode(client.get_account_info(metadata_account)['result']['value']['data'][0])
     metadata = unpack_metadata_account(data)
     return metadata

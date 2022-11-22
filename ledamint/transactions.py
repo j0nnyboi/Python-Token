@@ -182,7 +182,7 @@ def mint(api_endpoint, source_account, contract_key, dest_key, link, supply=1):
             signers=[source_account.public_key],
         )
     )
-    tx = tx.add(mint_to_ix) 
+    tx = tx.add(mint_to_ix)
     metadata = get_metadata(client, mint_account)
     update_metadata_data = update_metadata_instruction_data(
         metadata['data']['name'],

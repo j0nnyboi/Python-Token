@@ -22,10 +22,7 @@ from spl.token.constants import TOKEN_PROGRAM_ID
 import os
 import tkinter
 from tkinter.scrolledtext import ScrolledText
-from os.path import exists
-import threading
-
-
+from os.path import exist
 
 class Safecoin_Token(object):
 
@@ -69,12 +66,6 @@ class Safecoin_Token(object):
         self.showWalletbtn = tkinter.Button(self.top, text = "Show wallet import", command = self.Showimort)
         self.loadkeyLB = tkinter.Label(self.top, text = "import wallet:")
         self.DevFeebtn = tkinter.Button(self.top, text = "Dev Tip 1 safecoin", command = self.DevFee)
-        self.TKNorNFT = 0
-        self.TKNbtn = tkinter.Button(self.top, text = "TOKEN", command = lambda:self.TKN_NFT(1))
-        self.NFTbtn = tkinter.Button(self.top, text = "NFT", command = lambda:self.TKN_NFT(2))
-        self.Homebtn = tkinter.Button(self.top, text = "Reset", command = lambda:self.TKN_NFT(0))
-        self.NFTSinglebtn = tkinter.Button(self.top, text = "Upload a NFT", command = lambda:self.NFT_home(1))
-        self.NFTMultibtn = tkinter.Button(self.top, text = "Upload Multiple NFT", command = lambda:self.NFT_home(2))
 
         
     def Run(self):
@@ -82,12 +73,7 @@ class Safecoin_Token(object):
         while True:
             self.top.mainloop()
         
-    def TKN_NFT(self,typ):
-        self.TKNorNFT = typ
-        self.NFTbtn.place_forget()
-        self.TKNbtn.place_forget()
-        self.HomePage()
-        
+            
     def WalletBal(self):
         if(self.client.is_connected()):
             resp = self.client.get_balance(self.keypair.public_key)
@@ -131,27 +117,12 @@ class Safecoin_Token(object):
                 self.AirDropBTN.place(x=10, y=100)
             else:
                 self.AirDropBTN.place_forget()
+            self.TokenBTN.place(x=10, y=130)
+            self.TokenLoadLB.place(x=10, y=170)
+            self.TokenLoadBox.place(x=120, y=170)
+            self.TokenLoadbtn.place(x=100, y=200)
             self.showWalletbtn.place(x=10,y=400)
             self.DevFeebtn.place(x=10,y=450)
-            if(self.TKNorNFT==0):# chose
-
-                self.NFTbtn.place(x=100, y=200)
-                self.TKNbtn.place(x=100, y=230)
-                
-            elif(self.TKNorNFT==1):#Token
-                
-                self.TokenBTN.place(x=10, y=130)
-                self.TokenLoadLB.place(x=10, y=170)
-                self.TokenLoadBox.place(x=120, y=170)
-                self.TokenLoadbtn.place(x=100, y=200)
-
-            elif(self.TKNorNFT==2):#NFT
-
-                self.NFTSinglebtn.place(x=100, y=200)
-                self.NFTMultibtn.place(x=100, y=230)
-
-                
-               
         
     def NetworkChange(self,*args):
         self.Endpoint_selected = self.EndpintVar.get()
@@ -178,10 +149,6 @@ class Safecoin_Token(object):
     def deleteKey(self):
         os.remove('KeyPair.json')
         self.DeleteKeybtn.place_forget()
-        self.NFTMultibtn.place_forget()
-        self.NFTSinglebtn.place_forget()
-        self.TKNbtn.place_forget()
-        self.NFTbtn.place_forget()
         self.Loadkey.place_forget()
         self.loadkeybtn.place_forget()
         self.loadkeyLB.place_forget()
@@ -452,71 +419,3 @@ class Safecoin_Token(object):
             self.HomePage()
         else:
             print("not connected to %s"%self.api_endpoint)
-
-
-
-
-###########################################Token above NFT below share wallet connection, need to separtate out into smaller files in V2 but this will do for now ###################################
-
-    def NFT_home(self,typ):#1 = single 2 = multiple
-        self.NFTMultibtn.place_forget()
-        self.NFTSinglebtn.place_forget()
-        if(typ == 1 ):
-
-            print(self.keypair.public_key)
-            cfg = {
-                    "PRIVATE_KEY": base58.b58encode(self.keypair.seed).decode("ascii"),
-                    "PUBLIC_KEY": str(self.keypair.public_key),
-                    "DECRYPTION_KEY": Fernet.generate_key().decode("ascii"),
-                }
-            api = LedamintAPI(cfg)
-
-            # requires a JSON file with metadata. best to publish on Arweave
-            divinity_json_file = "https://arweave.net/m7ZkUD20TzJ80z3JPU-qNFICLX_pIpCUigCBj54sdEY"
-            #print(divinity_json_file)
-            # deploy a contract. will return a contract key.
-        
-            #print(api.wallet())
-            print("Deploy:")
-            result = api.deploy('https://api.testnet.safecoin.org', "Test NFT deploy", "TNF", fees=100)
-            print("Deploy completed. Result: %s",result)
-            print("Load contract key:")
-            contract_key = json.loads(result).get('contract')
-            print("Contract key loaded. Conract key: %s", contract_key)            
-            print(self.EndPoint[self.Endpoint_selected])
-            print("Mint:")
-            # conduct a mint, and send to a recipient, e.g. wallet_2
-            mint_res = api.mint('https://api.testnet.safecoin.org', contract_key, self.keypair.public_key, divinity_json_file)
-            print("Mint completed. Result: %s", mint_res)
-
-
-
-
-        #elif(typ == 2):
-
-    def await_full_confirmation(client, txn, max_timeout=60):
-        if txn is None:
-            return
-        elapsed = 0
-        while elapsed < max_timeout:
-            sleep_time = 1
-            time.sleep(sleep_time)
-            elapsed += sleep_time
-            resp = client.get_confirmed_transaction(txn)
-            while 'result' not in resp:
-                resp = client.get_confirmed_transaction(txn)
-            if resp["result"]:
-                print(f"Took {elapsed} seconds to confirm transaction {txn}")
-                break
-
-
-
-
-
-
-
-        
-Safe_Token = Safecoin_Token()
-Safe_Token.Run()
-
-
