@@ -93,6 +93,8 @@ class Safecoin_Token(object):
         self.NFTimgFile =""
         self.NFTRoyalites = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Royialties %")
         self.ArweaveWalletbtn = customtkinter.CTkButton(self.top, text = "Connect your Arweave Wallet", command = self.Arweave_wallet)
+        self.IMGBLKBTN = customtkinter.CTkButton(self.top, text ='Select folder of NFTs', command = self.IMGBLK)
+        self.MetaBLKBTN = customtkinter.CTkButton(self.top, text ='Select folder of Metadata', command = self.MetaBLK)
         
 
         
@@ -112,7 +114,7 @@ class Safecoin_Token(object):
             resp = self.client.get_balance(self.keypair.public_key)
             bal = int(resp['result']['value']) / 1000000000
             print("balance = ", bal)
-            return bal
+            self.walletBal.configure(text="Ballance = %s" % bal)
         else:
             print("Wallet connection ERROR")
             self.client = Client(self.EndPoint[self.Endpoint_selected])
@@ -155,7 +157,10 @@ class Safecoin_Token(object):
         self.NFTATTvalLB.place_forget()
         self.NFTUploadbtn.place_forget()
         self.NFTcollectionLB.place_forget()
-        self.NFTRoyalites.place_forget() 
+        self.NFTRoyalites.place_forget()
+        self.ArweaveWalletbtn.place_forget()
+        self.IMGBLKBTN.place_forget()
+        self.MetaBLKBTN.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -184,10 +189,9 @@ class Safecoin_Token(object):
             self.Endpoint_Drop.place(x=10, y=8)
    
         else:
-            self.wallet.configure(text=self.keypair.public_key)
-            WALLET_BAL = self.WalletBal()
+            
             self.walletBal.place(x=10, y=80)
-            self.walletBal.configure(text="Ballance = %s" % WALLET_BAL)
+            self.WalletBal()
             if(self.Endpoint_selected == 'Testnet' or self.Endpoint_selected == 'Devnet'):
                 self.AirDropBTN.place(x=150, y=80)
             else:
@@ -221,7 +225,7 @@ class Safecoin_Token(object):
         self.EndpintVar.set(self.Endpoint_selected)
         self.client = Client(self.EndPoint[self.Endpoint_selected])
         print(self.EndPoint[self.Endpoint_selected])
-        self.HomePage()
+        self.ClearHomepage()
 
         
     def loadKey(self):
@@ -287,7 +291,8 @@ class Safecoin_Token(object):
         print(self.keypair.public_key)
         self.client = Client(self.EndPoint[self.Endpoint_selected])
         self.wallet_connected = True
-        self.HomePage()
+        self.wallet.configure(text=self.keypair.public_key)
+        self.ClearHomepage()
 
 
     def CreateToken(self):
@@ -423,7 +428,7 @@ class Safecoin_Token(object):
     def DevFee(self):
         txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=900000200)))
         self.client.send_transaction(txn, self.keypair)
-        self.TokenText.insert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs")
+        self.TokenText.inself.ArweaveWalletbtnsert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs")
         self.TokenText.see("end")
 
     def MintToken(self, amount = 10):
@@ -487,7 +492,6 @@ class Safecoin_Token(object):
             print("Topup complete")
             self.TokenText.insert(tkinter.END,"Air drop completed tx = %s \n" % txn)
             #self.TokenText.see("end")
-            self.HomePage()
         else:
             print("not connected to %s"%self.api_endpoint)
 
@@ -499,6 +503,7 @@ class Safecoin_Token(object):
     def NFT_home(self,typ):#1 = single 2 = multiple
         self.NFTMultibtn.place_forget()
         self.NFTSinglebtn.place_forget()
+        self.ArweaveWalletbtn.place(x=10, y=170)
         if(typ == 1 ):
 
             self.NFTIMGbtn.place(x=10, y=200)
@@ -510,7 +515,7 @@ class Safecoin_Token(object):
             self.NFTATTvalLB.place(x=160, y=320)
             self.NFTcollectionLB.place(x=10, y=350)
             self.NFTRoyalites.place(x=160, y=380)
-            self.ArweaveWalletbtn.place(x=10, y=170)
+            
             """
             print(self.keypair.public_key)
             cfg = {
@@ -541,18 +546,25 @@ class Safecoin_Token(object):
 
 
 
-        #elif(typ == 2):
+        elif(typ == 2):
+            
+            self.IMGBLKBTN.place(x=10, y=200)
+            self.MetaBLKBTN.place(x=10, y=230)
 
-
+    def IMGBLK(self):
+        IMG_Folder = filedialog.askdirectory()
+    
+    def MetaBLK(self):
+        Meta_Folder = filedialog.askdirectory()
+    
     def NFT_img(self):
         self.NFTimgFile = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("NFT Images","*.jpg;*.png")])
         self.TokenText.insert(tkinter.END,"NFT Image Selected: %s \n" % self.NFTimgFile)
         self.NFTIMGbtn.configure(fg_color='green')
 
 
-
     def NFT_Meta(self):
-        filename = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = ("Text files","*.json*"))
+        filename = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = ("Text files","*.json"))
 
     def NFT_Upload(self):
             
@@ -614,7 +626,7 @@ class Safecoin_Token(object):
             print(MetaData)
 
     def Arweave_wallet(self):
-        arweaveWallet = filedialog.askopenfilename(initialdir = "/",title = "Select a Arweave wallet file",filetypes = ("Arweave Wallet","*.json*"))
+        arweaveWallet = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Arweave Wallet","*.json")])
         self.TokenText.insert(tkinter.END,"Arweave wallet selected: %s \n" % self.arweaveWallet)
         self.ArweaveWallet = arweave.Wallet(arweaveWallet)
         self.NFTUploadbtn.place(x=10, y=380)
