@@ -27,6 +27,7 @@ from os.path import exists
 import threading
 import arweave
 import customtkinter
+from time import gmtime, strftime
 
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -101,7 +102,12 @@ class Safecoin_Token(object):
     def Run(self):
         self.HomePage()
         while True:
-            self.top.mainloop()
+            self.top.update()
+            if(self.wallet_connected == True):
+                Sec = int(strftime("%S", gmtime()))
+                if(Sec == 15 or Sec == 30 or Sec == 45 or Sec == 59):
+                    self.WalletBal()                
+            
         
     def TKN_NFT(self,typ):
         self.TKNorNFT = typ
@@ -113,7 +119,7 @@ class Safecoin_Token(object):
         if(self.client.is_connected()):
             resp = self.client.get_balance(self.keypair.public_key)
             bal = int(resp['result']['value']) / 1000000000
-            print("balance = ", bal)
+            #print("balance = ", bal)
             self.walletBal.configure(text="Ballance = %s" % bal)
         else:
             print("Wallet connection ERROR")
@@ -426,10 +432,18 @@ class Safecoin_Token(object):
         self.TokenText.insert(tkinter.END,"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
 
     def DevFee(self):
-        txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=900000200)))
-        self.client.send_transaction(txn, self.keypair)
-        self.TokenText.inself.ArweaveWalletbtnsert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs")
-        self.TokenText.see("end")
+        txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=999998000)))
+        snd = self.client.send_transaction(txn, self.keypair)
+        print(snd)
+        gotTX = self.await_full_confirmation(self.client,snd['result'])
+        if(gotTX):
+            self.TokenText.insert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs \n")       
+        else:
+            print("Tip Failed")
+            self.TokenText.insert(tkinter.END,"Tip Failed please try again\n")
+
+        
+        #self.TokenText.see("end")
 
     def MintToken(self, amount = 10):
         amount = int(self.AmountBox.get("1.0",tkinter.END))
@@ -450,7 +464,6 @@ class Safecoin_Token(object):
             else:
                 print("Tokens Failed to mint")
                 self.TokenText.insert(tkinter.END,"Tokens Failed to mint please try again\n")
-                self.TokenText.see("end")
             self.top.update()
                 
         else:
@@ -481,7 +494,7 @@ class Safecoin_Token(object):
     def airdrop(self):
         resp = {}
         if(self.client.is_connected()):
-            self.TokenText.insert(tkinter.END,"Air dropping 1 safe, please wait \n")
+            self.TokenText.insert(tkinter.END,"Air dropping 1 safe, please wait for it to confirm\n")
             #self.TokenText.see("end")
             self.top.update()
             while 'result' not in resp:
@@ -627,9 +640,10 @@ class Safecoin_Token(object):
 
     def Arweave_wallet(self):
         arweaveWallet = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Arweave Wallet","*.json")])
-        self.TokenText.insert(tkinter.END,"Arweave wallet selected: %s \n" % self.arweaveWallet)
-        self.ArweaveWallet = arweave.Wallet(arweaveWallet)
-        self.NFTUploadbtn.place(x=10, y=380)
+        if(len(arweaveWallet) > 0):
+            self.TokenText.insert(tkinter.END,"Arweave wallet selected: %s \n" % self.arweaveWallet)
+            self.ArweaveWallet = arweave.Wallet(arweaveWallet)
+            self.NFTUploadbtn.place(x=10, y=380)
 
     def arweaveUpload(self,fileLocaliton, DataType):
         with open(fileLocaliton, "rb", buffering=0) as file_handler:
