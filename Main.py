@@ -6,7 +6,7 @@ import time
 import base58
 from safecoin.keypair import Keypair
 from safecoin.rpc.api import Client
-from ledamint.metadata import get_metadata
+from ledamint.metadata import get_metadata, get_metadata_account
 from cryptography.fernet import Fernet
 from api.ledamint_api import LedamintAPI
 
@@ -20,6 +20,7 @@ from spl.token.client import Token
 from spl.token.constants import TOKEN_PROGRAM_ID
 from tkinter import filedialog
 
+from time import gmtime, strftime,sleep
 import os
 import tkinter
 from tkinter.scrolledtext import ScrolledText
@@ -29,6 +30,7 @@ import arweave
 import customtkinter
 from time import gmtime, strftime
 
+import ValidatorMonitor
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green") 
@@ -77,6 +79,7 @@ class Safecoin_Token(object):
         self.DevFeebtn = customtkinter.CTkButton(self.top, text = "Dev Tip 1 safecoin", command = self.DevFee)
         self.HomePagebtn = customtkinter.CTkButton(self.top, text = "Home", command = self.ClearHomepage)
         self.TKNorNFT = 0
+        self.OwnMint=False
         self.TKNbtn = customtkinter.CTkButton(self.top, text = "TOKEN", command = lambda:self.TKN_NFT(1))
         self.NFTbtn = customtkinter.CTkButton(self.top, text = "NFT", command = lambda:self.TKN_NFT(2))
         self.Homebtn = customtkinter.CTkButton(self.top, text = "Reset", command = lambda:self.TKN_NFT(0))
@@ -97,7 +100,16 @@ class Safecoin_Token(object):
         self.IMGBLKBTN = customtkinter.CTkButton(self.top, text ='Select folder of NFTs', command = self.IMGBLK)
         self.MetaBLKBTN = customtkinter.CTkButton(self.top, text ='Select folder of Metadata', command = self.MetaBLK)
         
-
+        self.ValMonBTN = customtkinter.CTkButton(self.top, text ='Validator Monitor', command = self.ValMon)
+        self.ValID = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Validator ID")
+        self.ValVOTE = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Validator VOTE")
+        self.ValVIDWarn = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Validator ID Warn Amount")
+        self.ValVOTEWarn = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Validator VOTE Warn Amount")
+        self.DiscWebHock = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Discord webhock")
+        self.ValMonMonitorBTN = customtkinter.CTkButton(self.top, text ='Monitor Validator', command = self.ValMonMonitor)
+        
+        
+    
         
     def Run(self):
         self.HomePage()
@@ -167,6 +179,8 @@ class Safecoin_Token(object):
         self.ArweaveWalletbtn.place_forget()
         self.IMGBLKBTN.place_forget()
         self.MetaBLKBTN.place_forget()
+        self.ValMonBTN.place_forget()
+        self.ValMonMonitorBTN.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -195,31 +209,56 @@ class Safecoin_Token(object):
             self.Endpoint_Drop.place(x=10, y=8)
    
         else:
-            
-            self.walletBal.place(x=10, y=80)
-            self.WalletBal()
-            if(self.Endpoint_selected == 'Testnet' or self.Endpoint_selected == 'Devnet'):
-                self.AirDropBTN.place(x=150, y=80)
+            if(self.OwnMint==False and self.EndPoint[self.Endpoint_selected]== 'https://api.mainnet-beta.safecoin.org' ):
+                text = "Please purchace this NFT to use this software on mainnet, Devnet and Testnet are free\n"
+                tran = self.client.get_signatures_for_address('3TeRhNJj7rTMqHKx2znun9DfmgMh1KZaJbrbnzRg4Ttc')
+                try:
+                    for items in tran['result']: 
+                            print(items['signature'])
+                            res = self.client.get_confirmed_transaction(items['signature'])
+                            #print(res)
+                            mintowner = res['result']['meta']['postTokenBalances'][0]['owner']
+                            #print(mintowner)
+                            if(mintowner == str(self.keypair.public_key)):
+                                print("you own the mint")
+                                self.OwnMint=True
+                                text = "Thankyou for owning the NFT to use this software\n"
+                                break
+                except:
+                    print("Error")
+                self.TokenText.insert(tkinter.END,text)
+                        
+
+
+            if(self.OwnMint==True or self.EndPoint[self.Endpoint_selected]== 'https://api.testnet.safecoin.org' or self.EndPoint[self.Endpoint_selected]== 'https://api.devnet.safecoin.org'):
+                self.walletBal.place(x=10, y=80)
+                self.WalletBal()
+                if(self.Endpoint_selected == 'Testnet' or self.Endpoint_selected == 'Devnet'):
+                    self.AirDropBTN.place(x=150, y=80)
+                else:
+                    self.AirDropBTN.place_forget()
+                self.showWalletbtn.place(x=180,y=10)
+                self.DevFeebtn.place(x=10,y=450)
+                if(self.TKNorNFT==0):# chose
+
+                    self.NFTbtn.place(x=100, y=200)
+                    self.TKNbtn.place(x=100, y=230)
+                    self.ValMonBTN.place(x=100,y=260)
+                    
+                    
+                elif(self.TKNorNFT==1):#Token
+                    
+                    self.TokenBTN.place(x=10, y=130)
+                    self.TokenLoadBox.place(x=100, y=170)
+                    self.TokenLoadLB.place(x=10, y=170)
+                    self.TokenLoadbtn.place(x=100, y=200)
+
+                elif(self.TKNorNFT==2):#NFT
+
+                    self.NFTSinglebtn.place(x=100, y=200)
+                    self.NFTMultibtn.place(x=100, y=230)
             else:
-                self.AirDropBTN.place_forget()
-            self.showWalletbtn.place(x=180,y=10)
-            self.DevFeebtn.place(x=10,y=450)
-            if(self.TKNorNFT==0):# chose
-
-                self.NFTbtn.place(x=100, y=200)
-                self.TKNbtn.place(x=100, y=230)
-                
-            elif(self.TKNorNFT==1):#Token
-                
-                self.TokenBTN.place(x=10, y=130)
-                self.TokenLoadBox.place(x=100, y=170)
-                self.TokenLoadLB.place(x=10, y=170)
-                self.TokenLoadbtn.place(x=100, y=200)
-
-            elif(self.TKNorNFT==2):#NFT
-
-                self.NFTSinglebtn.place(x=100, y=200)
-                self.NFTMultibtn.place(x=100, y=230)
+                self.TokenText.insert(tkinter.END,"Make sure the NFT is in the connected wallet\n")
 
                 
                
@@ -231,6 +270,7 @@ class Safecoin_Token(object):
         self.EndpintVar.set(self.Endpoint_selected)
         self.client = Client(self.EndPoint[self.Endpoint_selected])
         print(self.EndPoint[self.Endpoint_selected])
+        self.OwnMint=False
         self.ClearHomepage()
 
         
@@ -677,8 +717,58 @@ class Safecoin_Token(object):
                 break
 
 
+##################################################################validator monitor########################################################################
+###########################################################################################################################################################
 
+    def ValMon(self):
+        self.TKNbtn.place_forget()
+        self.NFTbtn.place_forget()
+        self.ValMonBTN.place_forget()
+        self.ValID.place(x=10, y=160)
+        self.ValVOTE.place(x=10, y=190)
+        self.ValVIDWarn.place(x=10, y=220)
+        self.ValVOTEWarn.place(x=10, y=250)
+        self.DiscWebHock.place(x=10, y=280)
+        self.ValMonMonitorBTN.place(x=10, y=310)
 
+    def ValMonMonitor(self):
+        
+        ValidatorID = self.ValID.get()
+        ValidatorVote = self.ValVOTE.get()
+        IdentityBalanceWarn = self.ValVIDWarn.get()
+        VoteBalanceWarn = self.ValVOTEWarn.get()
+        Discord_Web_Hock = self.DiscWebHock.get()
+
+        
+        if(len(ValidatorID) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter validator ID pubkey\n")
+            self.ValID.configure(placeholder_text_color='red')
+        elif(len(ValidatorVote) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter Validator Vote Pubkey\n")
+            self.ValVOTE.configure(placeholder_text_color='red')
+        elif(len(IdentityBalanceWarn) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter ID Warn Amount \n")
+            self.ValVIDWarn.configure(placeholder_text_color='red')
+        elif(len(VoteBalanceWarn) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter Vote Warn Amount \n")
+            self.ValVOTEWarn.configure(placeholder_text_color='red')
+        elif(len(Discord_Web_Hock) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter Discord WebHock \n")
+            self.DiscWebHock.configure(placeholder_text_color='red')
+        else:
+            self.ValID.place_forget()
+            self.ValVOTE.place_forget()
+            self.ValVIDWarn.place_forget()
+            self.ValVOTEWarn.place_forget()
+            self.DiscWebHock.place_forget()
+            self.ValMonMonitorBTN.place_forget()
+            preMin = 99
+            webhook = Webhook.from_url(Discord_Web_Hock, adapter=RequestsWebhookAdapter())
+            while True:
+                Min = strftime("%M", gmtime())
+                if(preMin != Min):
+                    ValidatorMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorID,ValidatorVote,int(VoteBalanceWarn),int(IdentityBalanceWarn),webhook,Min)
+                    preMin = Min
 
 
 
