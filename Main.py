@@ -29,7 +29,7 @@ import threading
 import arweave
 import customtkinter
 from time import gmtime, strftime
-
+from discord import Webhook, RequestsWebhookAdapter
 import ValidatorMonitor
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -763,13 +763,37 @@ class Safecoin_Token(object):
             self.DiscWebHock.place_forget()
             self.ValMonMonitorBTN.place_forget()
             preMin = 99
-            webhook = Webhook.from_url(Discord_Web_Hock, adapter=RequestsWebhookAdapter())
+            VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock)
             while True:
                 Min = strftime("%M", gmtime())
                 if(preMin != Min):
-                    ValidatorMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorID,ValidatorVote,int(VoteBalanceWarn),int(IdentityBalanceWarn),webhook,Min)
+                    VM.MYMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorID,ValidatorVote,int(VoteBalanceWarn),int(IdentityBalanceWarn),Min)
                     preMin = Min
 
+    def otherValMonMonitor(self):
+        
+        ValidatorID = self.ValID.get()
+        Discord_Web_Hock = self.DiscWebHock.get()
+        ValidatorIDs = ValidatorID.split(',')
+        
+        if(len(ValidatorID) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter validator ID pubkey\n")
+            self.ValID.configure(placeholder_text_color='red')
+        elif(len(Discord_Web_Hock) <= 0 ):
+            self.TokenText.insert(tkinter.END,"Please enter Discord WebHock \n")
+            self.DiscWebHock.configure(placeholder_text_color='red')
+        else:
+            self.ValID.place_forget()
+            self.DiscWebHock.place_forget()
+            self.ValMonMonitorBTN.place_forget()
+            preMin = 99
+
+            VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock,ValidatorIDs)
+            while True:
+                Min = strftime("%M", gmtime())
+                if(preMin != Min):
+                    VM.OtherMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorIDs,Min)
+                    preMin = Min
 
 
         
