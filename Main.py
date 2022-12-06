@@ -29,8 +29,11 @@ import threading
 import arweave
 import customtkinter
 from time import gmtime, strftime
-from discord import Webhook, RequestsWebhookAdapter
+
 import ValidatorMonitor
+from coinGeko import getLatestPrice
+
+
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green") 
@@ -48,7 +51,7 @@ class Safecoin_Token(object):
         print(self.api_endpoint)
         self.keypair = ""
         self.top = customtkinter.CTk()
-        #self.top = tkinter.Tk()
+        self.top.title("SafeCoin one stop shop")
         self.top.geometry("900x500")
         self.wallet_connected = False
         self.EndpintVar = tkinter.StringVar(self.top)
@@ -62,8 +65,10 @@ class Safecoin_Token(object):
         self.TokenACCBTN = customtkinter.CTkButton(self.top, text = "Create A Token Account", command = self.CreateAcount)
         self.MintBtn = customtkinter.CTkButton(self.top, text = "MINT", command = self.MintToken)
         self.MintAntLB = customtkinter.CTkLabel(self.top, text = "Mint Amount:",width=30, height=25)
-        self.AmountBox = customtkinter.CTkEntry(self.top,height = 1, width = 20)
+        self.AmountBox = customtkinter.CTkEntry(self.top,height = 25, width = 100)
         self.walletBal = customtkinter.CTkLabel(self.top, text = "Balance = 0")
+        self.walletVal = customtkinter.CTkLabel(self.top, text = "Value = *")
+        self.SafeVal = customtkinter.CTkLabel(self.top, text = "SafeCoin Price: *")
         self.TokenLoadBox = customtkinter.CTkEntry(self.top,height = 25, width = 300)
         self.TokenLoadbtn = customtkinter.CTkButton(self.top, text = "Load Token:", command = self.loadToken)
         self.Loadkey = customtkinter.CTkEntry(self.top,height = 25, width = 300)
@@ -107,6 +112,9 @@ class Safecoin_Token(object):
         self.ValVOTEWarn = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Validator VOTE Warn Amount")
         self.DiscWebHock = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Discord webhock")
         self.ValMonMonitorBTN = customtkinter.CTkButton(self.top, text ='Monitor Validator', command = self.ValMonMonitor)
+        self.Val_var = tkinter.IntVar()
+        self.ValChoise1 = customtkinter.CTkRadioButton(master=self.top, text="Monitor Your Validator",command=self.ValChoise, variable= self.Val_var, value=1)
+        self.ValChoise2 = customtkinter.CTkRadioButton(master=self.top, text="Monitor Someone else Validator",command=self.ValChoise, variable= self.Val_var, value=2)
         
         
     
@@ -125,6 +133,7 @@ class Safecoin_Token(object):
         self.TKNorNFT = typ
         self.NFTbtn.place_forget()
         self.TKNbtn.place_forget()
+        self.ValMonBTN.place_forget()
         self.HomePage()
         
     def WalletBal(self):
@@ -132,7 +141,13 @@ class Safecoin_Token(object):
             resp = self.client.get_balance(self.keypair.public_key)
             bal = int(resp['result']['value']) / 1000000000
             #print("balance = ", bal)
-            self.walletBal.configure(text="Ballance = %s" % bal)
+            self.walletBal.configure(text="Ballance: %.4f Safe" % bal)
+            self.top.update()
+            (SafeValue, BWorth) = getLatestPrice(bal)
+            self.SafeVal.configure(text="SafeCoin Price: %.4f USD" % SafeValue)
+            self.walletVal.configure(text="Value: %.4f USD" % BWorth)
+            self.top.update()
+            
         else:
             print("Wallet connection ERROR")
             self.client = Client(self.EndPoint[self.Endpoint_selected])
@@ -180,7 +195,14 @@ class Safecoin_Token(object):
         self.IMGBLKBTN.place_forget()
         self.MetaBLKBTN.place_forget()
         self.ValMonBTN.place_forget()
+        self.ValChoise1.place_forget()
+        self.ValChoise2.place_forget()
         self.ValMonMonitorBTN.place_forget()
+        self.ValID.place_forget()
+        self.ValVOTE.place_forget()
+        self.ValVIDWarn.place_forget()
+        self.ValVOTEWarn.place_forget()
+        self.DiscWebHock.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -232,9 +254,11 @@ class Safecoin_Token(object):
 
             if(self.OwnMint==True or self.EndPoint[self.Endpoint_selected]== 'https://api.testnet.safecoin.org' or self.EndPoint[self.Endpoint_selected]== 'https://api.devnet.safecoin.org'):
                 self.walletBal.place(x=10, y=80)
+                self.SafeVal.place(x=160,y=450)
+                self.walletVal.place(x=10,y=100)
                 self.WalletBal()
                 if(self.Endpoint_selected == 'Testnet' or self.Endpoint_selected == 'Devnet'):
-                    self.AirDropBTN.place(x=150, y=80)
+                    self.AirDropBTN.place(x=180, y=80)
                 else:
                     self.AirDropBTN.place_forget()
                 self.showWalletbtn.place(x=180,y=10)
@@ -330,6 +354,7 @@ class Safecoin_Token(object):
         print(keypairStr)
         keypairlst = [int(x) for x in keypairStr]
         
+        
         #print(self.keypairStr)
         #print(bytearray(self.keypairStr))
         self.keypair = Keypair(bytes(keypairlst))
@@ -383,7 +408,7 @@ class Safecoin_Token(object):
         self.TokenText.insert(tkinter.END,"Token address = %s \n" % self.token_client.pubkey)
         #self.TokenText.see("end")
         self.TokenACCBTN.place(x=10, y=130)
-        self.TokenLoadAccBox.place(x=100, y=170)
+        self.TokenLoadAccBox.place(x=150, y=170)
         self.TokenLoadAccbtn.place(x=100, y=200)
         self.TokenLoadlb.place(x=10, y=170)
         self.token_PubKey = self.token_client.pubkey
@@ -391,7 +416,7 @@ class Safecoin_Token(object):
 
     def loadToken(self):
         
-        token_PubKey = self.TokenLoadBox.get("1.0",tkinter.END)
+        token_PubKey = self.TokenLoadBox.get()
         self.token_PubKey = token_PubKey.strip('\n')
         print(self.token_PubKey)
         self.TokenText.insert(tkinter.END,"Loaded Token %s \n" % self.token_PubKey)
@@ -401,12 +426,12 @@ class Safecoin_Token(object):
         self.TokenLoadBox.place_forget()
         self.TokenLoadbtn.place_forget()
         self.TokenBTN.place_forget()
-        self.TokenLoadAccBox.place(x=100, y=170)
+        self.TokenLoadAccBox.place(x=150, y=170)
         self.TokenLoadAccbtn.place(x=100, y=200)
         self.TokenLoadlb.place(x=10, y=170)
 
     def loadTokenACC(self):
-        token_Account = self.TokenLoadAccBox.get("1.0",tkinter.END)
+        token_Account = self.TokenLoadAccBox.get()
         self.token_Account = token_Account.strip('\n')
         print(self.token_Account)
         
@@ -417,6 +442,7 @@ class Safecoin_Token(object):
         self.MintAntLB.place(x=10, y=170)
         self.MintBtn.place(x=100, y=200)
         self.AmountBox.place(x=100, y=170)
+        self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
@@ -444,15 +470,17 @@ class Safecoin_Token(object):
                 amount += 1
                 if(amount > 100):
                     self.TokenText.insert(tkinter.END,"Creating a token Account Failed Please try again \n")
-                    self.TokenText.see("end")
+                    #self.TokenText.see("end")
                     self.top.update()
                     return
         print(resp)
         print(self.token_Account)
-        self.MintAntLB.place(x=10, y=270)
-        self.MintBtn.place(x=10, y=250)
-        self.AmountBox.place(x=100, y=270)
+        self.MintAntLB.place(x=10, y=170)
+        self.MintBtn.place(x=100, y=200)
+        self.AmountBox.place(x=100, y=170)
+        self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
+        self.GetTokenBalbtn.place(x=10, y=130)
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
         self.TokenLoadbtn.place_forget()
@@ -469,24 +497,28 @@ class Safecoin_Token(object):
         print(self.token_Account)
         TokenBall = self.TokenACCOUNT.get_balance(pubkey=self.token_Account)
         print(TokenBall)
-        self.TokenText.insert(tkinter.END,"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
+        if('error' not in TokenBall):
+            self.TokenText.insert(tkinter.END,"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
+        else:
+            self.TokenText.insert(tkinter.END,"Token Ballance Error, please check keypairs \n")
 
     def DevFee(self):
         txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=999998000)))
         snd = self.client.send_transaction(txn, self.keypair)
         print(snd)
-        gotTX = self.await_full_confirmation(self.client,snd['result'])
+        self.TokenText.insert(tkinter.END,"Sending 1 safecoin")
+        gotTX = self.await_TXN_full_confirmation(self.client,snd['result'])
         if(gotTX):
             self.TokenText.insert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs \n")       
         else:
             print("Tip Failed")
-            self.TokenText.insert(tkinter.END,"Tip Failed please try again\n")
+            self.TokenText.insert(tkinter.END,"Tip Failed\n")
 
         
         #self.TokenText.see("end")
 
     def MintToken(self, amount = 10):
-        amount = int(self.AmountBox.get("1.0",tkinter.END))
+        amount = int(self.AmountBox.get())
         print("amount = ",amount)
         self.TokenText.insert(tkinter.END,"Minting %s Tokens\n" % amount)
         self.top.update()
@@ -497,7 +529,8 @@ class Safecoin_Token(object):
                 amount=amount * 1000000,
             )
             print(resp)
-            gotTX = self.await_full_confirmation(self.client,resp['result'])
+            gotTX = self.await_TXN_full_confirmation(self.client,resp['result'])
+            print("tx : ",gotTX)
             if(gotTX):
                 print(amount, " tokens minted, tx = ",resp['result'])
                 self.TokenText.insert(tkinter.END,"Minted %s Tokens\n" % amount)       
@@ -512,7 +545,7 @@ class Safecoin_Token(object):
             #self.TokenText.see("end")
             self.top.update()
 
-    def await_full_confirmation(self,client, txn, max_timeout=60):
+    def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
             return False
         elapsed = 0
@@ -522,13 +555,16 @@ class Safecoin_Token(object):
             time.sleep(sleep_time)
             elapsed += sleep_time
             resp = self.client.get_confirmed_transaction(txn)
-            while 'result' not in resp:
-                print(resp)
-                resp = self.client.get_confirmed_transaction(txn)
+            print(resp)
+            self.TokenText.insert(tkinter.END,".")
+            self.top.update()
             if resp["result"]:
                 print(f"Took {elapsed} seconds to confirm transaction {txn}")
+                self.TokenText.insert(tkinter.END,"\n" )
                 gotTX = True
-                break
+                return True
+        
+        self.TokenText.insert(tkinter.END,"\n")        
         return gotTX
 
     def airdrop(self):
@@ -724,12 +760,31 @@ class Safecoin_Token(object):
         self.TKNbtn.place_forget()
         self.NFTbtn.place_forget()
         self.ValMonBTN.place_forget()
-        self.ValID.place(x=10, y=160)
-        self.ValVOTE.place(x=10, y=190)
-        self.ValVIDWarn.place(x=10, y=220)
-        self.ValVOTEWarn.place(x=10, y=250)
-        self.DiscWebHock.place(x=10, y=280)
-        self.ValMonMonitorBTN.place(x=10, y=310)
+        self.ValChoise1.place(x=10, y=130)
+        self.ValChoise2.place(x=10, y=160)
+        
+        
+    def ValChoise(self):
+        
+        if(self.Val_var.get() == 1):
+            
+            self.ValID.place(x=10, y=190)
+            self.ValVOTE.place(x=10, y=220)
+            self.ValVIDWarn.place(x=10, y=250)
+            self.ValVOTEWarn.place(x=10, y=280)
+            self.DiscWebHock.place(x=10, y=310)
+            self.ValMonMonitorBTN.place(x=10, y=340)
+            self.ValMonMonitorBTN.configure(command = self.ValMonMonitor)
+        else:
+            self.ValID.place(x=10, y=190)
+            self.ValID.configure(placeholder_text="Validator ID's")
+            self.TokenText.insert(tkinter.END,"Monitor More then 1 validator by placing a , between there ID's\n")
+            self.DiscWebHock.place(x=10, y=220)
+            self.ValMonMonitorBTN.place(x=10, y=250)
+            self.ValVOTEWarn.place_forget()
+            self.ValVIDWarn.place_forget()
+            self.ValMonMonitorBTN.configure(command = self.otherValMonMonitor)
+            
 
     def ValMonMonitor(self):
         
@@ -764,16 +819,20 @@ class Safecoin_Token(object):
             self.ValMonMonitorBTN.place_forget()
             preMin = 99
             VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock)
+            self.TokenText.insert(tkinter.END,"Monitoring your validators \n")
             while True:
+                self.top.update()
                 Min = strftime("%M", gmtime())
                 if(preMin != Min):
-                    VM.MYMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorID,ValidatorVote,int(VoteBalanceWarn),int(IdentityBalanceWarn),Min)
+                    VM.MYMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorID,ValidatorVote,int(VoteBalanceWarn),int(IdentityBalanceWarn))
                     preMin = Min
 
     def otherValMonMonitor(self):
         
         ValidatorID = self.ValID.get()
+        print(ValidatorID)
         Discord_Web_Hock = self.DiscWebHock.get()
+        print(Discord_Web_Hock)
         ValidatorIDs = ValidatorID.split(',')
         
         if(len(ValidatorID) <= 0 ):
@@ -789,10 +848,12 @@ class Safecoin_Token(object):
             preMin = 99
 
             VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock,ValidatorIDs)
+            self.TokenText.insert(tkinter.END,"Monitoring validators \n")
             while True:
+                self.top.update()
                 Min = strftime("%M", gmtime())
                 if(preMin != Min):
-                    VM.OtherMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorIDs,Min)
+                    VM.OtherMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorIDs)
                     preMin = Min
 
 

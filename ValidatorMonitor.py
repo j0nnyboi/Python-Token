@@ -2,20 +2,21 @@
 import requests
 
 from time import gmtime, strftime,sleep
-
+from discord import Webhook, RequestsWebhookAdapter
 from safecoin.keypair import Keypair
 from safecoin.rpc.api import Client
 from safecoin.rpc.types import MemcmpOpts
 from safecoin.publickey import PublicKey
 
 class ValidatorMonitor(object):
-        def __init(self,Discord_Web_Hock,ValidatorIDs):
+        def __init__(self,Discord_Web_Hock,ValidatorIDs):
                 self.ValidatorCheckTime = 5 #time in minutes between checking for you validator is off line
                 self.Daypre = 0
                 self.hourpre = 0
                 self.Counter = 99
+                self.MYcommission = {}
                 self.AlarmSent = False
-                for ids in ValidatorIDs
+                for ids in ValidatorIDs:
                         self.MYcommission[ids] = 101
                 self.MYcommissionPre = {}
                 self.webhook = Webhook.from_url(Discord_Web_Hock, adapter=RequestsWebhookAdapter())
@@ -23,16 +24,16 @@ class ValidatorMonitor(object):
         def DiscordSend(self,StringToSend):
                 self.webhook.send(StringToSend)
 
-        def MYMonitor(self,api_endpoint,client,ValidatorID,ValidatorVote,VoteBalanceWarn,IdentityBalanceWarn,Min):
+        def MYMonitor(self,api_endpoint,client,ValidatorID,ValidatorVote,VoteBalanceWarn,IdentityBalanceWarn):
             
 
                 hour = strftime("%H", gmtime())
-                if(hour != hourpre):
-                    hourpre = hour
+                if(hour != self.hourpre):
+                    self.hourpre = hour
                     AlarmSent = False
                     day = strftime("%d", gmtime())
-                    if(day != Daypre):
-                        Daypre = day
+                    if(day != self.Daypre):
+                        self.Daypre = day
                         if(client.is_connected()): 
                             VoteBalance = int(client.get_balance(ValidatorVote)['result']['value'])/1000000000
                             print("Vote account balance = ",VoteBalance)
@@ -46,9 +47,9 @@ class ValidatorMonitor(object):
                             client = Client(api_endpoint)
                     
 
-                Counter += 1
-                if(Counter >= ValidatorCheckTime):
-                        Counter = 0
+                self.Counter += 1
+                if(self.Counter >= self.ValidatorCheckTime):
+                        self.Counter = 0
                         if(client.is_connected() == True):
                             validatorList = (client.get_vote_accounts()['result']['delinquent'])
                             print("Latest delinquent validators")
@@ -66,12 +67,12 @@ class ValidatorMonitor(object):
                             client = Client(api_endpoint)                        
                                 
 
-        def OtherMonitor(self,api_endpoint,client,ValidatorIDs,Min):                    
+        def OtherMonitor(self,api_endpoint,client,ValidatorIDs):                    
                     
 
-                Counter += 1
-                if(Counter >= ValidatorCheckTime):
-                        Counter = 0
+                self.Counter += 1
+                if(self.Counter >= self.ValidatorCheckTime):
+                        self.Counter = 0
                         if(client.is_connected() == True):
                                 validatorList = (client.get_vote_accounts()['result'])
                                 current = validatorList['current']
@@ -86,9 +87,9 @@ class ValidatorMonitor(object):
                                                 print(nodePubkey,votePubkey)
                                                 
                                                 if(ValidatorID in nodePubkey or ValidatorID in votePubkey):
-                                                    print("^^^^^^^^^^^^^^^^^^^found my Validator^^^^^^^^^^^^^^^^^^")
+                                                    print("^^^^^^^^^^^^^^^^^^^found Validator^^^^^^^^^^^^^^^^^^")
                                                     if(AlarmSent == False):
-                                                        self.DiscordSend("Your validator has gone off line")
+                                                        self.DiscordSend("validator has gone off line")
                                                         self.AlarmSent = True
                                                 
                                 print("Latest running validators")
