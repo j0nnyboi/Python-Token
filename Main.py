@@ -84,7 +84,7 @@ class Safecoin_Token(object):
         self.DevFeebtn = customtkinter.CTkButton(self.top, text = "Dev Tip 1 safecoin", command = self.DevFee)
         self.HomePagebtn = customtkinter.CTkButton(self.top, text = "Home", command = self.ClearHomepage)
         self.TKNorNFT = 0
-        self.OwnMint=False
+        self.OwnMint=True
         self.TKNbtn = customtkinter.CTkButton(self.top, text = "TOKEN", command = lambda:self.TKN_NFT(1))
         self.NFTbtn = customtkinter.CTkButton(self.top, text = "NFT", command = lambda:self.TKN_NFT(2))
         self.Homebtn = customtkinter.CTkButton(self.top, text = "Reset", command = lambda:self.TKN_NFT(0))
@@ -115,7 +115,11 @@ class Safecoin_Token(object):
         self.Val_var = tkinter.IntVar()
         self.ValChoise1 = customtkinter.CTkRadioButton(master=self.top, text="Monitor Your Validator",command=self.ValChoise, variable= self.Val_var, value=1)
         self.ValChoise2 = customtkinter.CTkRadioButton(master=self.top, text="Monitor Someone else Validator",command=self.ValChoise, variable= self.Val_var, value=2)
-        
+
+        self.addTokenMetaBTN = customtkinter.CTkButton(self.top, text ='Add token to Reg', command = self.TokenReg)
+        self.TKNname = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Name")
+        self.TKNticker = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
+        self.TKNimg = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Img URL")
         
     
         
@@ -294,7 +298,7 @@ class Safecoin_Token(object):
         self.EndpintVar.set(self.Endpoint_selected)
         self.client = Client(self.EndPoint[self.Endpoint_selected])
         print(self.EndPoint[self.Endpoint_selected])
-        self.OwnMint=False
+        self.OwnMint=True
         self.ClearHomepage()
 
         
@@ -451,6 +455,7 @@ class Safecoin_Token(object):
         self.TokenLoadAccBox.place_forget()
         self.TokenLoadAccbtn.place_forget()
         self.TokenLoadlb.place_forget()
+        self.addTokenMetaBTN.place(x=10, y=240)
         self.GetTokenBalbtn.place(x=10, y=130)
         
         
@@ -490,6 +495,7 @@ class Safecoin_Token(object):
         self.TokenLoadlb.place_forget()
         self.TokenText.insert(tkinter.END,"Creating a token Account created %s \n" % self.token_Account)
         #self.TokenText.see("end")
+        self.addTokenMetaBTN.place(x=10, y=240)
         self.top.update()
         return self.token_Account
 
@@ -533,7 +539,7 @@ class Safecoin_Token(object):
             print("tx : ",gotTX)
             if(gotTX):
                 print(amount, " tokens minted, tx = ",resp['result'])
-                self.TokenText.insert(tkinter.END,"Minted %s Tokens\n" % amount)       
+                self.TokenText.insert(tkinter.END,"Minted %s Tokens completed\n" % amount)       
             else:
                 print("Tokens Failed to mint")
                 self.TokenText.insert(tkinter.END,"Tokens Failed to mint please try again\n")
@@ -544,6 +550,13 @@ class Safecoin_Token(object):
             self.TokenText.insert(tkinter.END,"please just use numbers")
             #self.TokenText.see("end")
             self.top.update()
+
+    def TokenReg(self):
+        self.MintAntLB.place_forget()
+        self.MintBtn.place_forget()
+        self.AmountBox.place_forget()
+        self.GetTokenBalbtn.place_forget()
+        self.addTokenMetaBTN.place_forget()
 
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
@@ -604,35 +617,6 @@ class Safecoin_Token(object):
             self.NFTATTvalLB.place(x=160, y=320)
             self.NFTcollectionLB.place(x=10, y=350)
             self.NFTRoyalites.place(x=160, y=380)
-            
-            """
-            print(self.keypair.public_key)
-            cfg = {
-                    "PRIVATE_KEY": base58.b58encode(self.keypair.seed).decode("ascii"),
-                    "PUBLIC_KEY": str(self.keypair.public_key),
-                    "DECRYPTION_KEY": Fernet.generate_key().decode("ascii"),
-                }
-            api = LedamintAPI(cfg)
-
-            # requires a JSON file with metadata. best to publish on Arweave
-            divinity_json_file = "https://arweave.net/m7ZkUD20TzJ80z3JPU-qNFICLX_pIpCUigCBj54sdEY"
-            #print(divinity_json_file)
-            # deploy a contract. will return a contract key.
-        
-            #print(api.wallet())
-            print("Deploy:")
-            result = api.deploy(self.EndPoint[self.Endpoint_selected], "Test NFT deploy", "TNF", fees=100)
-            print("Deploy completed. Result: %s",result)
-            print("Load contract key:")
-            contract_key = json.loads(result).get('contract')
-            print("Contract key loaded. Conract key: %s", contract_key)            
-            print(self.EndPoint[self.Endpoint_selected])
-            print("Mint:")
-            # conduct a mint, and send to a recipient, e.g. wallet_2
-            mint_res = api.mint(self.EndPoint[self.Endpoint_selected], contract_key, self.keypair.public_key, divinity_json_file)
-            print("Mint completed. Result: %s", mint_res)"""
-
-
 
 
         elif(typ == 2):
@@ -818,7 +802,7 @@ class Safecoin_Token(object):
             self.DiscWebHock.place_forget()
             self.ValMonMonitorBTN.place_forget()
             preMin = 99
-            VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock)
+            VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock,ValidatorID)
             self.TokenText.insert(tkinter.END,"Monitoring your validators \n")
             while True:
                 self.top.update()

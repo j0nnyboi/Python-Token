@@ -37,6 +37,7 @@ class ValidatorMonitor(object):
                         if(client.is_connected()): 
                             VoteBalance = int(client.get_balance(ValidatorVote)['result']['value'])/1000000000
                             print("Vote account balance = ",VoteBalance)
+                            print(ValidatorID)
                             if(VoteBalance > VoteBalanceWarn):
                                 self.DiscordSend("you have earnt to much safe, to be on your validator, time to move it,amount is %s use (~/Safecoin/target/release/safecoin withdraw-from-vote-account VoteAddress DesternationWallet amount)"% VoteBalance)
                             IDBalance = int(client.get_balance(ValidatorID)['result']['value'])/1000000000
