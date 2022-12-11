@@ -30,7 +30,6 @@ import arweave
 import customtkinter
 from time import gmtime, strftime
 import json
-
 import ValidatorMonitor
 from coinGeko import getLatestPrice
 
@@ -121,6 +120,7 @@ class Safecoin_Token(object):
         self.TKNname = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Name")
         self.TKNticker = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
         self.TKNimg = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Img URL")
+        self.TKNDSK = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Desicription")
         self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
     
         
@@ -208,6 +208,11 @@ class Safecoin_Token(object):
         self.ValVIDWarn.place_forget()
         self.ValVOTEWarn.place_forget()
         self.DiscWebHock.place_forget()
+        self.addTokenMetaBTN.place_forget()
+        self.TKNname.place_forget()
+        self.TKNticker.place_forget()
+        self.TKNimg.place_forget()
+        self.addTokeRegBTN
         self.TKNorNFT=0
         self.HomePage()
     
@@ -565,12 +570,14 @@ class Safecoin_Token(object):
         self.TKNname.place(x=10, y=150)
         self.TKNticker.place(x=10, y=180)
         self.TKNimg.place(x=10, y=210)
-        self.addTokeRegBTN.place(x=10, y=240)
+        self.TKNDSK.place(x=10, y=240)
+        self.addTokeRegBTN.place(x=10, y=270)
 
     def Tokenreq(self):
         TokenName = self.TKNname.get()
         TokenTicker = self.TKNticker.get()
         TokenImgURL = self.TKNimg.get()
+        TokenDSK = self.TKNDSK.get()
         if(len(TokenName) == 0):
             self.TKNname.configure(placeholder_text_color='red')
             return
@@ -580,21 +587,39 @@ class Safecoin_Token(object):
         if(len(TokenImgURL) == 0):
             self.TKNimg.configure(placeholder_text_color='red')
             return
+        if(len(TokenDSK) == 0):
+            TokenDSK = None
+            return
             
         self.TokenText.insert(tkinter.END,"Trying to reqister token on chanin please wait ..\n")
         self.TKNname.place_forget()
         self.TKNticker.place_forget()
         self.TKNimg.place_forget()
         self.addTokeRegBTN.place_forget()
+
+        ###########################################################################################
+
+
+        returnarweaveURL = {"name": TokenName,
+          "symbol": TokenTicker,
+          "description": TokenDSK,
+          "image": TokenImgURL
+        }##need to upload this metadta to arweave
+
+        ######arweave upload image then ARWEAVE metadata then below
         
         metadataPDA = str(self.keypair.public_key)# need to work out
-        
-        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"image": TokenImgURL}
+        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"image": returnarweaveURL}
         sendDic = {'metadata': metadataPDA,
             'metadataData': tokenMetadata,
             'updateAuthority': str(self.keypair.public_key),
             'mint': self.token_PubKey,
-            'mintAuthority': str(self.keypair.public_key)}
+            'mintAuthority': str(self.keypair.public_key),
+            "sellerFeeBasisPoints": 0,
+            "creators": null,
+            "collection": null,
+            "uses": null}
+        
         print(sendDic)
         print(json.dumps(sendDic))
         

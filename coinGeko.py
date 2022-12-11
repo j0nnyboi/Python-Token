@@ -8,3 +8,8 @@ def getLatestPrice(safeAmount):
     #print(safePrice * safeAmount)
     return (safePrice, safePrice * safeAmount)
 
+def getLatestPriceArweave():
+    arweavePrice = CoinGeko.get_price(ids='arweave', vs_currencies='usd')['arweave']['usd']
+    return (arweavePrice)
+
+
