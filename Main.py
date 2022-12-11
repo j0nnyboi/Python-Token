@@ -29,6 +29,7 @@ import threading
 import arweave
 import customtkinter
 from time import gmtime, strftime
+import json
 
 import ValidatorMonitor
 from coinGeko import getLatestPrice
@@ -120,7 +121,7 @@ class Safecoin_Token(object):
         self.TKNname = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Name")
         self.TKNticker = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
         self.TKNimg = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Img URL")
-        
+        self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
     
         
     def Run(self):
@@ -463,6 +464,13 @@ class Safecoin_Token(object):
         self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
         print(self.token_PubKey)
         
+        self.TokenLoadLB.place_forget()
+        self.TokenLoadBox.place_forget()
+        self.TokenLoadbtn.place_forget()
+        self.TokenACCBTN.place_forget()
+        self.TokenLoadAccBox.place_forget()
+        self.TokenLoadAccbtn.place_forget()
+        
         self.token_Account = self.TokenACCOUNT.create_account(self.token_PubKey,skip_confirmation = True)
         print(self.token_Account)
         resp = self.client.get_account_info(self.token_Account)
@@ -476,6 +484,10 @@ class Safecoin_Token(object):
                 if(amount > 100):
                     self.TokenText.insert(tkinter.END,"Creating a token Account Failed Please try again \n")
                     #self.TokenText.see("end")
+                    self.TokenACCBTN.place(x=10, y=130)
+                    self.TokenLoadAccBox.place(x=150, y=170)
+                    self.TokenLoadAccbtn.place(x=100, y=200)
+                    self.TokenLoadlb.place(x=10, y=170)
                     self.top.update()
                     return
         print(resp)
@@ -486,13 +498,6 @@ class Safecoin_Token(object):
         self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
         self.GetTokenBalbtn.place(x=10, y=130)
-        self.TokenLoadLB.place_forget()
-        self.TokenLoadBox.place_forget()
-        self.TokenLoadbtn.place_forget()
-        self.TokenACCBTN.place_forget()
-        self.TokenLoadAccBox.place_forget()
-        self.TokenLoadAccbtn.place_forget()
-        self.TokenLoadlb.place_forget()
         self.TokenText.insert(tkinter.END,"Creating a token Account created %s \n" % self.token_Account)
         #self.TokenText.see("end")
         self.addTokenMetaBTN.place(x=10, y=240)
@@ -557,6 +562,42 @@ class Safecoin_Token(object):
         self.AmountBox.place_forget()
         self.GetTokenBalbtn.place_forget()
         self.addTokenMetaBTN.place_forget()
+        self.TKNname.place(x=10, y=150)
+        self.TKNticker.place(x=10, y=180)
+        self.TKNimg.place(x=10, y=210)
+        self.addTokeRegBTN.place(x=10, y=240)
+
+    def Tokenreq(self):
+        TokenName = self.TKNname.get()
+        TokenTicker = self.TKNticker.get()
+        TokenImgURL = self.TKNimg.get()
+        if(len(TokenName) == 0):
+            self.TKNname.configure(placeholder_text_color='red')
+            return
+        if(len(TokenTicker) == 0):
+            self.TKNticker.configure(placeholder_text_color='red')
+            return
+        if(len(TokenImgURL) == 0):
+            self.TKNimg.configure(placeholder_text_color='red')
+            return
+            
+        self.TokenText.insert(tkinter.END,"Trying to reqister token on chanin please wait ..\n")
+        self.TKNname.place_forget()
+        self.TKNticker.place_forget()
+        self.TKNimg.place_forget()
+        self.addTokeRegBTN.place_forget()
+        
+        metadataPDA = str(self.keypair.public_key)# need to work out
+        
+        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"image": TokenImgURL}
+        sendDic = {'metadata': metadataPDA,
+            'metadataData': tokenMetadata,
+            'updateAuthority': str(self.keypair.public_key),
+            'mint': self.token_PubKey,
+            'mintAuthority': str(self.keypair.public_key)}
+        print(sendDic)
+        print(json.dumps(sendDic))
+        
 
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
