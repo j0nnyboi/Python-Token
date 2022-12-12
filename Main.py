@@ -122,6 +122,9 @@ class Safecoin_Token(object):
         self.TKNimg = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Img URL")
         self.TKNDSK = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Desicription")
         self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
+
+        self.ChainMonBTN = customtkinter.CTkButton(self.top, text ='Chain Monitor', command = self.ChainMonitor)
+        self.ValInfoBTN = customtkinter.CTkButton(self.top, text ='Validator Info', command = self.GetValidators)
     
         
     def Run(self):
@@ -138,6 +141,7 @@ class Safecoin_Token(object):
         self.TKNorNFT = typ
         self.NFTbtn.place_forget()
         self.TKNbtn.place_forget()
+        self.ChainMonBTN.place_forget()
         self.ValMonBTN.place_forget()
         self.HomePage()
         
@@ -212,7 +216,10 @@ class Safecoin_Token(object):
         self.TKNname.place_forget()
         self.TKNticker.place_forget()
         self.TKNimg.place_forget()
-        self.addTokeRegBTN
+        self.addTokeRegBTN.place_forget()
+        self.ChainMonBTN.place_forget()
+        self.ValInfoBTN.place_forget()
+        self.TokenText.delete(tkinter.END)
         self.TKNorNFT=0
         self.HomePage()
     
@@ -278,6 +285,7 @@ class Safecoin_Token(object):
                     self.NFTbtn.place(x=100, y=200)
                     self.TKNbtn.place(x=100, y=230)
                     self.ValMonBTN.place(x=100,y=260)
+                    self.ChainMonBTN.place(x=100,y=290)
                     
                     
                 elif(self.TKNorNFT==1):#Token
@@ -295,7 +303,7 @@ class Safecoin_Token(object):
                 self.TokenText.insert(tkinter.END,"Make sure the NFT is in the connected wallet\n")
 
                 
-               
+    
         
     def NetworkChange(self,*args):
         self.Endpoint_selected = self.EndpintVar.get()
@@ -810,6 +818,7 @@ class Safecoin_Token(object):
         self.TKNbtn.place_forget()
         self.NFTbtn.place_forget()
         self.ValMonBTN.place_forget()
+        self.ChainMonBTN.place_forget()
         self.ValChoise1.place(x=10, y=130)
         self.ValChoise2.place(x=10, y=160)
         
@@ -906,6 +915,21 @@ class Safecoin_Token(object):
                     VM.OtherMonitor(self.EndPoint[self.Endpoint_selected],self.client,ValidatorIDs)
                     preMin = Min
 
+
+########################################################################################################################################################################################
+
+    def ChainMonitor(self):
+        self.NFTbtn.place_forget()
+        self.TKNbtn.place_forget()
+        self.ValMonBTN.place_forget()
+        self.ChainMonBTN.place_forget()
+        self.ValInfoBTN.place(x=100, y=200)
+
+    def GetValidators(self):
+        VI = ValidatorMonitor.validatorInfo(self.client)
+        VI.getVal(self.TokenText,tkinter)
+        #VI.get_stake_activation()
+        
 
         
 Safe_Token = Safecoin_Token()

@@ -116,4 +116,23 @@ class ValidatorMonitor(object):
                         else:
                             client = Client(api_endpoint)
                         
+class validatorInfo(object):
+        def __init__(self,client):
+                self.client = client
 
+        def getVal(self,TokenText,tkinter):
+                #print(client.get_vote_accounts())
+                validatorList = (self.client.get_vote_accounts()['result'])
+                current = validatorList['current']
+                for lst in current:
+                        #print(lst['votePubkey'])
+                        #print(lst['activatedStake'])
+                        #print(lst['commission'])
+                        print(self.get_stake_activation(lst['votePubkey']),lst['votePubkey'])
+                        print("Validator: %s Commision: %d stake: %s \n"% (lst['votePubkey'],lst['commission'],lst['activatedStake']))
+                        #TokenText.insert(tkinter.END,"Validator: %s Commision: %d stake: %s \n"% (lst['votePubkey'],lst['commission'],lst['activatedStake']))
+                        
+                #deliquennt = validatorList['delinquent']
+
+        def get_stake_activation(self, pubkey):
+                return self.client.get_stake_activation(pubkey)
