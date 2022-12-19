@@ -120,19 +120,22 @@ class validatorInfo(object):
         def __init__(self,client):
                 self.client = client
 
-        def getVal(self,TokenText,tkinter):
+        def getVal(self):
                 #print(client.get_vote_accounts())
+                returnLst ={}
                 validatorList = (self.client.get_vote_accounts()['result'])
                 current = validatorList['current']
                 for lst in current:
                         #print(lst['votePubkey'])
                         #print(lst['activatedStake'])
                         #print(lst['commission'])
-                        print(self.get_stake_activation(lst['votePubkey']),lst['votePubkey'])
-                        print("Validator: %s Commision: %d stake: %s \n"% (lst['votePubkey'],lst['commission'],lst['activatedStake']))
+                        #print(self.get_stake_activation(lst['votePubkey']),lst['votePubkey'])
+                        returnLst[lst['votePubkey']] = {}
+                        returnLst[lst['votePubkey']]['Com'] = lst['commission']
+                        returnLst[lst['votePubkey']]['stake'] = lst['activatedStake']
                         #TokenText.insert(tkinter.END,"Validator: %s Commision: %d stake: %s \n"% (lst['votePubkey'],lst['commission'],lst['activatedStake']))
-                        
                 #deliquennt = validatorList['delinquent']
+                return returnLst
 
         def get_stake_activation(self, pubkey):
                 return self.client.get_stake_activation(pubkey)

@@ -44,7 +44,6 @@ class Safecoin_Token(object):
 
         self.EndPoint = {"Mainnet":"https://api.mainnet-beta.safecoin.org",
                     "Testnet":"https://api.testnet.safecoin.org",
-                         
                     "Devnet":"https://api.devnet.safecoin.org"}
         self.api_endpoint = self.EndPoint['Mainnet']
         self.Endpoint_selected = 'Mainnet'
@@ -52,13 +51,13 @@ class Safecoin_Token(object):
         self.keypair = ""
         self.top = customtkinter.CTk()
         self.top.title("SafeCoin one stop shop")
-        self.top.geometry("900x500")
+        self.top.geometry("1000x500")
         self.wallet_connected = False
         self.EndpintVar = tkinter.StringVar(self.top)
         self.EndpintVar.set("Mainnet")
         
         self.AirDropBTN = customtkinter.CTkButton(self.top, text ='Airdrop 1 safecoin', command = self.airdrop)
-        self.TokenText = customtkinter.CTkTextbox(self.top,height = 400, width = 380)
+        self.TokenText = customtkinter.CTkTextbox(self.top,height = 400, width = 480)
         self.TokenText.place(x=500, y=10)
         self.TokenBTN = customtkinter.CTkButton(self.top, text = "Create A Token", command = self.CreateToken)
         #self.TokenBTN = customtkinter.CTkButton(self.top, text = "Create A Token", command = self.CreateAcount)
@@ -125,6 +124,8 @@ class Safecoin_Token(object):
 
         self.ChainMonBTN = customtkinter.CTkButton(self.top, text ='Chain Monitor', command = self.ChainMonitor)
         self.ValInfoBTN = customtkinter.CTkButton(self.top, text ='Validator Info', command = self.GetValidators)
+        self.ValStakeBTN = customtkinter.CTkButton(self.top, text ='Validator Stake info', command = self.GetValStake)
+        self.ClearTxtBTN = customtkinter.CTkButton(self.top, text ='Clear', command = self.ClearTxt)
     
         
     def Run(self):
@@ -144,6 +145,9 @@ class Safecoin_Token(object):
         self.ChainMonBTN.place_forget()
         self.ValMonBTN.place_forget()
         self.HomePage()
+
+    def ClearTxt(self):
+        self.TokenText.delete('1.0', tkinter.END)
         
     def WalletBal(self):
         if(self.client.is_connected()):
@@ -226,6 +230,7 @@ class Safecoin_Token(object):
     def HomePage(self):
         wallet_exists = exists('KeyPair.json')
         self.HomePagebtn.place(x=740, y=460)
+        self.ClearTxtBTN.place(x=650, y=420)
         if(self.wallet_connected == False):
             if(wallet_exists):
                 text ="Wallet Connect"
@@ -926,10 +931,21 @@ class Safecoin_Token(object):
         self.ValInfoBTN.place(x=100, y=200)
 
     def GetValidators(self):
-        VI = ValidatorMonitor.validatorInfo(self.client)
-        VI.getVal(self.TokenText,tkinter)
-        #VI.get_stake_activation()
-        
+        self.VI = ValidatorMonitor.validatorInfo(self.client)
+        self.valdata = self.VI.getVal()
+        #print(self.valdata)
+        for k,v in self.valdata.items():
+            self.TokenText.insert(tkinter.END,"%s\nCommission:%s  Stake:%s \n \n" %(k,v['Com'],v['stake']))
+        self.ValStakeBTN.place(x=100, y=230)
+
+    def GetValStake(self):
+        for k,v in self.valdata.items():
+            #print(k,v)
+            stakeData = self.VI.get_stake_activation(k)
+            print(k)
+            print(stakeData)
+            print(stakeData['result']['active'])
+            print(stakeData['result']['inactive'])
 
         
 Safe_Token = Safecoin_Token()
