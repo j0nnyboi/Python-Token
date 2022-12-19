@@ -126,7 +126,7 @@ class Safecoin_Token(object):
         self.ValInfoBTN = customtkinter.CTkButton(self.top, text ='Validator Info', command = self.GetValidators)
         self.ValStakeBTN = customtkinter.CTkButton(self.top, text ='Validator Stake info', command = self.GetValStake)
         self.ClearTxtBTN = customtkinter.CTkButton(self.top, text ='Clear', command = self.ClearTxt)
-    
+        self.LrgAccountsBTN = customtkinter.CTkButton(self.top, text ='Get Largest Accounts', command = self.LrgAcc)
         
     def Run(self):
         self.HomePage()
@@ -224,6 +224,8 @@ class Safecoin_Token(object):
         self.ChainMonBTN.place_forget()
         self.ValInfoBTN.place_forget()
         self.TokenText.delete(tkinter.END)
+        self.ValStakeBTN.place_forget()
+        self.LrgAccountsBTN.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -937,15 +939,28 @@ class Safecoin_Token(object):
         for k,v in self.valdata.items():
             self.TokenText.insert(tkinter.END,"%s\nCommission:%s  Stake:%s \n \n" %(k,v['Com'],v['stake']))
         self.ValStakeBTN.place(x=100, y=230)
+        self.LrgAccountsBTN.place(x=100, y=260)
 
     def GetValStake(self):
         for k,v in self.valdata.items():
             #print(k,v)
             stakeData = self.VI.get_stake_activation(k)
-            print(k)
-            print(stakeData)
-            print(stakeData['result']['active'])
-            print(stakeData['result']['inactive'])
+            #print(k)
+            #print(stakeData)
+            #print(stakeData['result']['active'])
+            #print(stakeData['result']['inactive'])
+            self.TokenText.insert(tkinter.END,"%s\nStake Active:%s  deactive:%s \n \n" %(k,stakeData['result']['active'],stakeData['result']['inactive']))
+
+    def LrgAcc(self):
+        LrgAcc = self.client.get_largest_accounts()['result']['value']
+        #LrgAcc = LrgAcc.split('}, {')
+        self.TokenText.insert(tkinter.END,"largest accounts \n")
+        for i in range(20):
+            #print(LrgAcc[i]['address'])
+            #print(LrgAcc[i]['lamports'])
+            self.TokenText.insert(tkinter.END,"%s : %s \n" %(LrgAcc[i]['address'],LrgAcc[i]['lamports']))
+            
+        #print(LrgAcc)
 
         
 Safe_Token = Safecoin_Token()
