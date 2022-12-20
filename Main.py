@@ -232,6 +232,7 @@ class Safecoin_Token(object):
         self.TokenText.delete(tkinter.END)
         self.ValStakeBTN.place_forget()
         self.LrgAccountsBTN.place_forget()
+        self.NFTDescLB.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -523,6 +524,7 @@ class Safecoin_Token(object):
         self.AmountBox.place(x=100, y=170)
         self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
+        self.TokenLoadlb.place_forget()
         self.GetTokenBalbtn.place(x=10, y=130)
         self.TokenText.insert('1.0',"Creating a token Account created %s \n" % self.token_Account)
         #self.TokenText.see("end")
