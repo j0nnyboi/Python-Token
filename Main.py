@@ -130,12 +130,17 @@ class Safecoin_Token(object):
         
     def Run(self):
         self.HomePage()
+        once = 1
         while True:
             self.top.update()
             if(self.wallet_connected == True):
                 Sec = int(strftime("%S", gmtime()))
                 if(Sec == 15 or Sec == 30 or Sec == 45 or Sec == 59):
-                    self.WalletBal()                
+                    if(once == 1):
+                        once = 0
+                        self.WalletBal()
+                else:
+                    once = 1
             
         
     def TKN_NFT(self,typ):
@@ -163,6 +168,7 @@ class Safecoin_Token(object):
             
         else:
             print("Wallet connection ERROR")
+            self.TokenText.insert('1.0',"Error getting wallet ballance and not connected to %s\n" % self.EndPoint[self.Endpoint_selected])
             self.client = Client(self.EndPoint[self.Endpoint_selected])
             return 0
         
@@ -272,7 +278,7 @@ class Safecoin_Token(object):
                                 break
                 except:
                     print("Error")
-                self.TokenText.insert(tkinter.END,text)
+                self.TokenText.insert('1.0',text)
                         
 
 
@@ -307,7 +313,7 @@ class Safecoin_Token(object):
                     self.NFTSinglebtn.place(x=100, y=200)
                     self.NFTMultibtn.place(x=100, y=230)
             else:
-                self.TokenText.insert(tkinter.END,"Make sure the NFT is in the connected wallet\n")
+                self.TokenText.insert('1.0',"Make sure the NFT is in the connected wallet\n")
 
                 
     
@@ -347,8 +353,8 @@ class Safecoin_Token(object):
     def Showimort(self):
         secret = [b for b in self.keypair.secret_key]
         print(secret)
-        self.TokenText.insert(tkinter.END,"use this string to import into wallet.safecoin.org \n")
-        self.TokenText.insert(tkinter.END,"%s \n" % secret)
+        self.TokenText.insert('1.0',"use this string to import into wallet.safecoin.org \n")
+        self.TokenText.insert('1.0',"%s \n" % secret)
         #self.TokenText.see("end")
         
 
@@ -392,7 +398,7 @@ class Safecoin_Token(object):
 
 
     def CreateToken(self):
-        self.TokenText.insert(tkinter.END,"Creating a token and waiting for confirmation, Please wait .. \n")
+        self.TokenText.insert('1.0',"Creating a token and waiting for confirmation, Please wait .. \n")
         self.TokenBTN.place_forget()
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
@@ -418,7 +424,7 @@ class Safecoin_Token(object):
                 time.sleep(1)
                 amount += 1
                 if(amount > 100):
-                    self.TokenText.insert(tkinter.END,"Creating a token Failed Please try again \n")
+                    self.TokenText.insert('1.0',"Creating a token Failed Please try again \n")
                     #self.TokenText.see("end")
                     self.TokenBTN.place(x=200, y=200)
                     self.top.update()
@@ -430,7 +436,7 @@ class Safecoin_Token(object):
         assert self.token_client.program_id == TOKEN_PROGRAM_ID
         assert self.token_client.payer.public_key == self.keypair.public_key
         assert resp["result"]["value"]["owner"] == str(TOKEN_PROGRAM_ID)
-        self.TokenText.insert(tkinter.END,"Token address = %s \n" % self.token_client.pubkey)
+        self.TokenText.insert('1.0',"Token address = %s \n" % self.token_client.pubkey)
         #self.TokenText.see("end")
         self.TokenACCBTN.place(x=10, y=130)
         self.TokenLoadAccBox.place(x=150, y=170)
@@ -444,7 +450,7 @@ class Safecoin_Token(object):
         token_PubKey = self.TokenLoadBox.get()
         self.token_PubKey = token_PubKey.strip('\n')
         print(self.token_PubKey)
-        self.TokenText.insert(tkinter.END,"Loaded Token %s \n" % self.token_PubKey)
+        self.TokenText.insert('1.0',"Loaded Token %s \n" % self.token_PubKey)
         #self.TokenText.see("end")
         self.TokenACCBTN.place(x=10, y=130)
         self.TokenLoadLB.place_forget()
@@ -462,7 +468,7 @@ class Safecoin_Token(object):
         
         self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
 
-        self.TokenText.insert(tkinter.END,"Loaded Token Account %s \n" % self.token_Account)
+        self.TokenText.insert('1.0',"Loaded Token Account %s \n" % self.token_Account)
         #self.TokenText.see("end")
         self.MintAntLB.place(x=10, y=170)
         self.MintBtn.place(x=100, y=200)
@@ -502,7 +508,7 @@ class Safecoin_Token(object):
                 time.sleep(1)
                 amount += 1
                 if(amount > 100):
-                    self.TokenText.insert(tkinter.END,"Creating a token Account Failed Please try again \n")
+                    self.TokenText.insert('1.0',"Creating a token Account Failed Please try again \n")
                     #self.TokenText.see("end")
                     self.TokenACCBTN.place(x=10, y=130)
                     self.TokenLoadAccBox.place(x=150, y=170)
@@ -518,7 +524,7 @@ class Safecoin_Token(object):
         self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
         self.GetTokenBalbtn.place(x=10, y=130)
-        self.TokenText.insert(tkinter.END,"Creating a token Account created %s \n" % self.token_Account)
+        self.TokenText.insert('1.0',"Creating a token Account created %s \n" % self.token_Account)
         #self.TokenText.see("end")
         self.addTokenMetaBTN.place(x=10, y=240)
         self.top.update()
@@ -529,21 +535,21 @@ class Safecoin_Token(object):
         TokenBall = self.TokenACCOUNT.get_balance(pubkey=self.token_Account)
         print(TokenBall)
         if('error' not in TokenBall):
-            self.TokenText.insert(tkinter.END,"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
+            self.TokenText.insert('1.0',"Token Ballance = %s \n" % int(TokenBall['result']['value']['uiAmount']))
         else:
-            self.TokenText.insert(tkinter.END,"Token Ballance Error, please check keypairs \n")
+            self.TokenText.insert('1.0',"Token Ballance Error, please check keypairs \n")
 
     def DevFee(self):
         txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=999998000)))
         snd = self.client.send_transaction(txn, self.keypair)
         print(snd)
-        self.TokenText.insert(tkinter.END,"Sending 1 safecoin")
+        self.TokenText.insert('1.0',"Sending 1 safecoin")
         gotTX = self.await_TXN_full_confirmation(self.client,snd['result'])
         if(gotTX):
-            self.TokenText.insert(tkinter.END,"Thankyou for your support, appreciate all the donations, keeps me making free open source programs \n")       
+            self.TokenText.insert('1.0',"Thankyou for your support, appreciate all the donations, keeps me making free open source programs \n")       
         else:
             print("Tip Failed")
-            self.TokenText.insert(tkinter.END,"Tip Failed\n")
+            self.TokenText.insert('1.0',"Tip Failed\n")
 
         
         #self.TokenText.see("end")
@@ -551,7 +557,7 @@ class Safecoin_Token(object):
     def MintToken(self, amount = 10):
         amount = int(self.AmountBox.get())
         print("amount = ",amount)
-        self.TokenText.insert(tkinter.END,"Minting %s Tokens\n" % amount)
+        self.TokenText.insert('1.0',"Minting %s Tokens\n" % amount)
         self.top.update()
         if(type(amount) == int):
             resp = self.TokenACCOUNT.mint_to(
@@ -564,15 +570,15 @@ class Safecoin_Token(object):
             print("tx : ",gotTX)
             if(gotTX):
                 print(amount, " tokens minted, tx = ",resp['result'])
-                self.TokenText.insert(tkinter.END,"Minted %s Tokens completed\n" % amount)       
+                self.TokenText.insert('1.0',"Minted %s Tokens completed\n" % amount)       
             else:
                 print("Tokens Failed to mint")
-                self.TokenText.insert(tkinter.END,"Tokens Failed to mint please try again\n")
+                self.TokenText.insert('1.0',"Tokens Failed to mint please try again\n")
             self.top.update()
                 
         else:
             print("please use just numbers")
-            self.TokenText.insert(tkinter.END,"please just use numbers")
+            self.TokenText.insert('1.0',"please just use numbers")
             #self.TokenText.see("end")
             self.top.update()
 
@@ -606,7 +612,7 @@ class Safecoin_Token(object):
             TokenDSK = None
             return
             
-        self.TokenText.insert(tkinter.END,"Trying to reqister token on chanin please wait ..\n")
+        self.TokenText.insert('1.0',"Trying to reqister token on chanin please wait ..\n")
         self.TKNname.place_forget()
         self.TKNticker.place_forget()
         self.TKNimg.place_forget()
@@ -650,21 +656,21 @@ class Safecoin_Token(object):
             elapsed += sleep_time
             resp = self.client.get_confirmed_transaction(txn)
             print(resp)
-            self.TokenText.insert(tkinter.END,".")
+            self.TokenText.insert('1.0',".")
             self.top.update()
             if resp["result"]:
                 print(f"Took {elapsed} seconds to confirm transaction {txn}")
-                self.TokenText.insert(tkinter.END,"\n" )
+                self.TokenText.insert('1.0',"\n" )
                 gotTX = True
                 return True
         
-        self.TokenText.insert(tkinter.END,"\n")        
+        self.TokenText.insert('1.0',"\n")        
         return gotTX
 
     def airdrop(self):
         resp = {}
         if(self.client.is_connected()):
-            self.TokenText.insert(tkinter.END,"Air dropping 1 safe, please wait for it to confirm\n")
+            self.TokenText.insert('1.0',"Air dropping 1 safe, please wait for it to confirm\n")
             #self.TokenText.see("end")
             self.top.update()
             while 'result' not in resp:
@@ -673,7 +679,7 @@ class Safecoin_Token(object):
             self.await_full_confirmation(self.client, txn)
             print(resp)
             print("Topup complete")
-            self.TokenText.insert(tkinter.END,"Air drop completed tx = %s \n" % txn)
+            self.TokenText.insert('1.0',"Air drop completed tx = %s \n" % txn)
             #self.TokenText.see("end")
         else:
             print("not connected to %s"%self.api_endpoint)
@@ -713,7 +719,7 @@ class Safecoin_Token(object):
     
     def NFT_img(self):
         self.NFTimgFile = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("NFT Images","*.jpg;*.png")])
-        self.TokenText.insert(tkinter.END,"NFT Image Selected: %s \n" % self.NFTimgFile)
+        self.TokenText.insert('1.0',"NFT Image Selected: %s \n" % self.NFTimgFile)
         self.NFTIMGbtn.configure(fg_color='green')
 
 
@@ -731,19 +737,19 @@ class Safecoin_Token(object):
         Royal = self.NFTRoyalites.get()
         
         if(len(self.NFTimgFile) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please select a NFT image \n")
+            self.TokenText.insert('1.0',"Please select a NFT image \n")
             self.NFTIMGbtn.configure(fg_color='red')
         elif(len(name) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter name \n")
+            self.TokenText.insert('1.0',"Please enter name \n")
             self.NFTNameLB.configure(placeholder_text_color='red')
         elif(len(SYM) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Symbol \n")
+            self.TokenText.insert('1.0',"Please enter Symbol \n")
             self.NFTSYMLB.configure(placeholder_text_color='red')
         elif(len(Des) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Description \n")
+            self.TokenText.insert('1.0',"Please enter Description \n")
             self.NFTDescLB.configure(placeholder_text_color='red')
         elif(len(Royal) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Royalties \n")
+            self.TokenText.insert('1.0',"Please enter Royalties \n")
             self.NFTRoyalites.configure(placeholder_text_color='red')
         else:
 
@@ -782,7 +788,7 @@ class Safecoin_Token(object):
     def Arweave_wallet(self):
         arweaveWallet = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Arweave Wallet","*.json")])
         if(len(arweaveWallet) > 0):
-            self.TokenText.insert(tkinter.END,"Arweave wallet selected: %s \n" % self.arweaveWallet)
+            self.TokenText.insert('1.0',"Arweave wallet selected: %s \n" % self.arweaveWallet)
             self.ArweaveWallet = arweave.Wallet(arweaveWallet)
             self.NFTUploadbtn.place(x=10, y=380)
 
@@ -844,7 +850,7 @@ class Safecoin_Token(object):
         else:
             self.ValID.place(x=10, y=190)
             self.ValID.configure(placeholder_text="Validator ID's")
-            self.TokenText.insert(tkinter.END,"Monitor More then 1 validator by placing a , between there ID's\n")
+            self.TokenText.insert('1.0',"Monitor More then 1 validator by placing a , between there ID's\n")
             self.DiscWebHock.place(x=10, y=220)
             self.ValMonMonitorBTN.place(x=10, y=250)
             self.ValVOTEWarn.place_forget()
@@ -862,19 +868,19 @@ class Safecoin_Token(object):
 
         
         if(len(ValidatorID) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter validator ID pubkey\n")
+            self.TokenText.insert('1.0',"Please enter validator ID pubkey\n")
             self.ValID.configure(placeholder_text_color='red')
         elif(len(ValidatorVote) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Validator Vote Pubkey\n")
+            self.TokenText.insert('1.0',"Please enter Validator Vote Pubkey\n")
             self.ValVOTE.configure(placeholder_text_color='red')
         elif(len(IdentityBalanceWarn) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter ID Warn Amount \n")
+            self.TokenText.insert('1.0',"Please enter ID Warn Amount \n")
             self.ValVIDWarn.configure(placeholder_text_color='red')
         elif(len(VoteBalanceWarn) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Vote Warn Amount \n")
+            self.TokenText.insert('1.0',"Please enter Vote Warn Amount \n")
             self.ValVOTEWarn.configure(placeholder_text_color='red')
         elif(len(Discord_Web_Hock) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Discord WebHock \n")
+            self.TokenText.insert('1.0',"Please enter Discord WebHock \n")
             self.DiscWebHock.configure(placeholder_text_color='red')
         else:
             self.ValID.place_forget()
@@ -885,7 +891,7 @@ class Safecoin_Token(object):
             self.ValMonMonitorBTN.place_forget()
             preMin = 99
             VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock,ValidatorID)
-            self.TokenText.insert(tkinter.END,"Monitoring your validators \n")
+            self.TokenText.insert('1.0',"Monitoring your validators \n")
             while True:
                 self.top.update()
                 Min = strftime("%M", gmtime())
@@ -902,10 +908,10 @@ class Safecoin_Token(object):
         ValidatorIDs = ValidatorID.split(',')
         
         if(len(ValidatorID) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter validator ID pubkey\n")
+            self.TokenText.insert('1.0',"Please enter validator ID pubkey\n")
             self.ValID.configure(placeholder_text_color='red')
         elif(len(Discord_Web_Hock) <= 0 ):
-            self.TokenText.insert(tkinter.END,"Please enter Discord WebHock \n")
+            self.TokenText.insert('1.0',"Please enter Discord WebHock \n")
             self.DiscWebHock.configure(placeholder_text_color='red')
         else:
             self.ValID.place_forget()
@@ -914,7 +920,7 @@ class Safecoin_Token(object):
             preMin = 99
 
             VM = ValidatorMonitor.ValidatorMonitor(Discord_Web_Hock,ValidatorIDs)
-            self.TokenText.insert(tkinter.END,"Monitoring validators \n")
+            self.TokenText.insert('1.0',"Monitoring validators \n")
             while True:
                 self.top.update()
                 Min = strftime("%M", gmtime())
@@ -937,7 +943,7 @@ class Safecoin_Token(object):
         self.valdata = self.VI.getVal()
         #print(self.valdata)
         for k,v in self.valdata.items():
-            self.TokenText.insert(tkinter.END,"%s\nCommission:%s  Stake:%s \n \n" %(k,v['Com'],v['stake']))
+            self.TokenText.insert('1.0',"%s\nCommission:%s  Stake:%s \n \n" %(k,v['Com'],v['stake']))
         self.ValStakeBTN.place(x=100, y=230)
         self.LrgAccountsBTN.place(x=100, y=260)
 
@@ -949,17 +955,17 @@ class Safecoin_Token(object):
             #print(stakeData)
             #print(stakeData['result']['active'])
             #print(stakeData['result']['inactive'])
-            self.TokenText.insert(tkinter.END,"%s\nStake Active:%s  deactive:%s \n \n" %(k,stakeData['result']['active'],stakeData['result']['inactive']))
+            self.TokenText.insert('1.0',"%s\nStake Active:%s  deactive:%s \n \n" %(k,stakeData['result']['active'],stakeData['result']['inactive']))
 
     def LrgAcc(self):
         LrgAcc = self.client.get_largest_accounts()['result']['value']
         #LrgAcc = LrgAcc.split('}, {')
-        self.TokenText.insert(tkinter.END,"largest accounts \n")
+        
         for i in range(20):
             #print(LrgAcc[i]['address'])
             #print(LrgAcc[i]['lamports'])
-            self.TokenText.insert(tkinter.END,"%s : %s \n" %(LrgAcc[i]['address'],LrgAcc[i]['lamports']))
-            
+            self.TokenText.insert('1.0',"%s : %s \n" %(LrgAcc[i]['address'],LrgAcc[i]['lamports']))
+        self.TokenText.insert('1.0',"largest accounts \n")
         #print(LrgAcc)
 
         
