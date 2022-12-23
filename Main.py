@@ -32,6 +32,7 @@ from time import gmtime, strftime
 import json
 import ValidatorMonitor
 from coinGeko import getLatestPrice
+import requests
 
 
 
@@ -117,8 +118,9 @@ class Safecoin_Token(object):
 
         self.addTokenMetaBTN = customtkinter.CTkButton(self.top, text ='Add token to Reg', command = self.TokenReg)
         self.TKNname = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Name")
-        self.TKNticker = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
-        self.TKNimg = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Img URL")
+        self.TKNticker = customtkinter.CTkButton(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
+        
+        self.TKNimg = customtkinter.CTkEntry(self.top, text="Token Img"command = self.TokenImg)
         self.TKNDSK = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Desicription")
         self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
 
@@ -592,14 +594,14 @@ class Safecoin_Token(object):
         self.addTokenMetaBTN.place_forget()
         self.TKNname.place(x=10, y=150)
         self.TKNticker.place(x=10, y=180)
-        self.TKNimg.place(x=10, y=210)
+        #self.TKNimg.place(x=10, y=210)
         self.TKNDSK.place(x=10, y=240)
         self.addTokeRegBTN.place(x=10, y=270)
 
     def Tokenreq(self):
         TokenName = self.TKNname.get()
         TokenTicker = self.TKNticker.get()
-        TokenImgURL = self.TKNimg.get()
+        
         TokenDSK = self.TKNDSK.get()
         if(len(TokenName) == 0):
             self.TKNname.configure(placeholder_text_color='red')
@@ -607,14 +609,14 @@ class Safecoin_Token(object):
         if(len(TokenTicker) == 0):
             self.TKNticker.configure(placeholder_text_color='red')
             return
-        if(len(TokenImgURL) == 0):
-            self.TKNimg.configure(placeholder_text_color='red')
+        if(len(self.TokenFileName) == 0):
+            self.TKNimg.configure(text_color='red')
             return
         if(len(TokenDSK) == 0):
             TokenDSK = None
             return
             
-        self.TokenText.insert('1.0',"Trying to reqister token on chanin please wait ..\n")
+        self.TokenText.insert('1.0',"Trying to reqister token on chain please wait ..\n")
         self.TKNname.place_forget()
         self.TKNticker.place_forget()
         self.TKNimg.place_forget()
@@ -622,31 +624,57 @@ class Safecoin_Token(object):
 
         ###########################################################################################
 
-
-        returnarweaveURL = {"name": TokenName,
-          "symbol": TokenTicker,
-          "description": TokenDSK,
-          "image": TokenImgURL
-        }##need to upload this metadta to arweave
-
-        ######arweave upload image then ARWEAVE metadata then below
+        #workout amount and send safecoin to es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc so it can be converted to arweave
         
-        metadataPDA = str(self.keypair.public_key)# need to work out
-        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"image": returnarweaveURL}
-        sendDic = {'metadata': metadataPDA,
-            'metadataData': tokenMetadata,
-            'updateAuthority': str(self.keypair.public_key),
-            'mint': self.token_PubKey,
-            'mintAuthority': str(self.keypair.public_key),
-            "sellerFeeBasisPoints": 0,
-            "creators": null,
-            "collection": null,
-            "uses": null}
+        instruction = transfer(
+                from_public_key=self.keypair.public_key,
+                to_public_key="es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc", 
+                lamports=amount
+            )
+        transaction = Transaction(instructions=[instruction], signers=[self.keypair])
+        result = client.send_transaction(transaction)
+
+        print(result)
         
-        print(sendDic)
-        print(json.dumps(sendDic))
+        with open(self.TokenFileName,"rb") as f:
+            f_bytes = f.read()
+        f_b64 = base64.b64encode(f_bytes).decode("utf8")
+
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+            
+        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"description": TokenDSK,"image": ""}
+        sendDic = {"name": TokenName,
+                "symbol": TokenTicker,
+                "description": TokenDSK,
+                "image": ""
+                "updateAuthority": str(self.keypair.public_key),
+                "mint": self.token_PubKey,
+                "mintAuthority": str(self.keypair.public_key),
+                "sellerFeeBasisPoints": 0,
+                "creators": null,
+                "collection": null,
+                "uses": null}
+        
+        payload = json.dumps({"imageb64": f_b64, sendDic,"env":self.EndPoint[self.Endpoint_selected],'transaction':result['tx']})
+        response = requests.post("https://onestopshop.ledamint.io",data=payload, headers=headers)
+        print(response)
+
+        if(response['error'] == 'Chain ERROR'):
+            print('Didnt recive safecoin in arweave wallet')
+            return
+
         
 
+        result = api.deploy(api_endpoint, TokenName, TokenTicker)
+        contract_key = json.loads(result).get('contract')
+        # conduct a mint, and send to a recipient, e.g. wallet_2
+        mint_res = api.mint(api_endpoint, contract_key, self.token_Account, response['aweaveURL'])
+
+        
+    def TokenImg(self):
+        self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = ("PNG files","*.PNG"))
+        
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
             return False
