@@ -698,12 +698,13 @@ class Safecoin_Token(object):
                 "description": TokenDSK,
                 "image": "",
                 "updateAuthority": str(self.keypair.public_key),
-                "mint": self.token_PubKey,
+                "mint": str(self.token_PubKey),
                 "mintAuthority": str(self.keypair.public_key),
                 "sellerFeeBasisPoints": 0,
                 "creators": None,
                 "collection": None,
                 "uses": None}
+        
         ImgType = self.TokenFileName.split('.')[1]
         payload = json.dumps({"metadata":sendDic, "env":self.EndPoint[self.Endpoint_selected],'transaction':snd['result'],'image':f_b64,'type':ImgType})
         #print(payload)
@@ -717,19 +718,29 @@ class Safecoin_Token(object):
         if(res == 'ERROR'):
             print('Didnt recive safecoin in arweave wallet')
             return
+        self.TokenText.insert('1.0',"\n" )
+        self.TokenText.insert('1.0',res)
+        self.TokenText.insert('1.0',"Arweave Token reg URL: ")
+        self.TokenText.insert('1.0',"\n")
 
-
-        result = api.deploy(api_endpoint, TokenName, TokenTicker)
+        cfg = {
+            "PRIVATE_KEY": base58.b58encode(self.keypair.seed).decode("ascii"),
+            "PUBLIC_KEY": str(self.keypair.public_key),
+            "DECRYPTION_KEY": Fernet.generate_key().decode("ascii"),
+        }
+        #print(cfg)
+        api = LedamintAPI(cfg)
+        result = api.deploy(self.EndPoint[self.Endpoint_selected], TokenName, TokenTicker,0)
         contract_key = json.loads(result).get('contract')
         # conduct a mint, and send to a recipient, e.g. wallet_2
-        mint_res = api.mint(api_endpoint, contract_key, self.token_Account, res)
+        mint_res = api.mint(self.EndPoint[self.Endpoint_selected], contract_key, self.token_Account, res)
 
         
     def TokenImg(self):
         self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Image","*.jpg;*.png")])
         self.TokenText.insert('1.0',"\n" )
         self.TokenText.insert('1.0',self.TokenFileName)
-        self.TokenText.insert(tkinter.END,"\n")
+        self.TokenText.insert('1.0',"\n")
         
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
