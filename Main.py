@@ -4,6 +4,7 @@ import random
 import json
 import time
 import base58
+import base64
 from safecoin.keypair import Keypair
 from safecoin.rpc.api import Client
 from ledamint.metadata import get_metadata, get_metadata_account
@@ -27,11 +28,12 @@ from tkinter.scrolledtext import ScrolledText
 from os.path import exists
 import threading
 import arweave
+from arweave.utils import winston_to_ar
 import customtkinter
 from time import gmtime, strftime
 import json
 import ValidatorMonitor
-from coinGeko import getLatestPrice
+from coinGeko import getLatestPrice,getLatestPriceArweave,getLatestPriceSafecoin
 import requests
 
 
@@ -118,12 +120,14 @@ class Safecoin_Token(object):
 
         self.addTokenMetaBTN = customtkinter.CTkButton(self.top, text ='Add token to Reg', command = self.TokenReg)
         self.TKNname = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Name")
-        self.TKNticker = customtkinter.CTkButton(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
+        self.TKNticker = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Ticker")
         
-        self.TKNimg = customtkinter.CTkEntry(self.top, text="Token Img"command = self.TokenImg)
+        self.TKNimg = customtkinter.CTkButton(self.top, text="Token Img",command = self.TokenImg)
         self.TKNDSK = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Token Desicription")
         self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
-
+        self.addTokeBurnBTN = customtkinter.CTkButton(self.top, text ='Token Burn', command = self.TokenBurn)
+        self.TKNBurnAmount = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Burn Amount")
+        
         self.ChainMonBTN = customtkinter.CTkButton(self.top, text ='Chain Monitor', command = self.ChainMonitor)
         self.ValInfoBTN = customtkinter.CTkButton(self.top, text ='Validator Info', command = self.GetValidators)
         self.ValStakeBTN = customtkinter.CTkButton(self.top, text ='Validator Stake info', command = self.GetValStake)
@@ -487,6 +491,8 @@ class Safecoin_Token(object):
         self.TokenLoadlb.place_forget()
         self.addTokenMetaBTN.place(x=10, y=240)
         self.GetTokenBalbtn.place(x=10, y=130)
+        self.addTokeBurnBTN.place(x=10, y=270)
+        self.TKNBurnAmount.place(x=200, y=270)
         
         
     def CreateAcount(self):
@@ -531,6 +537,8 @@ class Safecoin_Token(object):
         self.TokenText.insert('1.0',"Creating a token Account created %s \n" % self.token_Account)
         #self.TokenText.see("end")
         self.addTokenMetaBTN.place(x=10, y=240)
+        self.addTokeBurnBTN.place(x=10, y=270)
+        self.TKNBurnAmount.place(x=200, y=270)
         self.top.update()
         return self.token_Account
 
@@ -543,6 +551,18 @@ class Safecoin_Token(object):
         else:
             self.TokenText.insert('1.0',"Token Ballance Error, please check keypairs \n")
 
+
+    def TokenBurn(self):
+        burnAmount = int(self.TKNBurnAmount.get())
+        tx = self.TokenACCOUNT.burn(account=self.token_Account,owner=self.keypair,amount=burnAmount)
+        print(tx)
+        gotTX = self.await_TXN_full_confirmation(self.client,tx['result'])
+        if(gotTX):
+            self.TokenText.insert('1.0',"%s Token burnt \n"%burnAmount)       
+        else:
+            print("Tip Failed")
+            self.TokenText.insert('1.0',"Burn Failed\n")
+            
     def DevFee(self):
         txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="JoNVxV8vwBdHqLJ2FT4meLupYKUVVDYr1Pm4DJUp8cZ", lamports=999998000)))
         snd = self.client.send_transaction(txn, self.keypair)
@@ -594,9 +614,11 @@ class Safecoin_Token(object):
         self.addTokenMetaBTN.place_forget()
         self.TKNname.place(x=10, y=150)
         self.TKNticker.place(x=10, y=180)
-        #self.TKNimg.place(x=10, y=210)
+        self.TKNimg.place(x=10, y=210)
         self.TKNDSK.place(x=10, y=240)
         self.addTokeRegBTN.place(x=10, y=270)
+        self.addTokeBurnBTN.place_forget()
+        self.TKNBurnAmount.place_forget()
 
     def Tokenreq(self):
         TokenName = self.TKNname.get()
@@ -621,59 +643,93 @@ class Safecoin_Token(object):
         self.TKNticker.place_forget()
         self.TKNimg.place_forget()
         self.addTokeRegBTN.place_forget()
+        self.TKNDSK.place_forget()
 
         ###########################################################################################
 
-        #workout amount and send safecoin to es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc so it can be converted to arweave
+        arweavePrice = getLatestPriceArweave()
+        SafecoinPrice = getLatestPriceSafecoin()
+        exchangeRate = arweavePrice / SafecoinPrice
+        AR_FEE_MULTIPLIER = 20 / 100
         
-        instruction = transfer(
-                from_public_key=self.keypair.public_key,
-                to_public_key="es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc", 
-                lamports=amount
-            )
-        transaction = Transaction(instructions=[instruction], signers=[self.keypair])
-        result = client.send_transaction(transaction)
-
-        print(result)
-        
+            
         with open(self.TokenFileName,"rb") as f:
             f_bytes = f.read()
         f_b64 = base64.b64encode(f_bytes).decode("utf8")
 
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        
+        tokenimgSize = os.path.getsize(self.TokenFileName)
+        #print("image size %s" % tokenimgSize)
 
-            
+        API_URL = "https://arweave.net"
+        url = "{}/price/{}".format(API_URL, tokenimgSize)
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+             #print("Cost in winston %s " % response.text)
+             TokenimgCost = winston_to_ar(response.text)
+        else:
+            self.TokenText.insert('1.0',"Unable to get cost of Token image, Please try again\n")
+            return
+        #print("TokenCost %s" % TokenimgCost)
+        #print("SafeAmount exact %s" % (exchangeRate * TokenimgCost))
+        Safeamount = ((TokenimgCost * exchangeRate) * 15)
+        #print("SafeAmount %s" %Safeamount)
+        self.TokenText.insert('1.0',"\nToken image and metadata cost %s safe\n" % Safeamount)
+        
+        #workout amount and send safecoin to es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc so it can be converted to arweave
+
+        txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey="es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc", lamports=int(Safeamount * 1000000000))))
+        snd = self.client.send_transaction(txn, self.keypair)
+        print(snd)
+        gotTX = self.await_TXN_full_confirmation(self.client,snd['result'])
+        if(gotTX):
+            self.TokenText.insert('1.0',"Safecoin sent and converted for storage on arweave, uploading image and metadata\n")       
+        else:
+            self.TokenText.insert('1.0',"Sending safecoin for upload failed please try again\n")
+            return
+           
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+   
         tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"description": TokenDSK,"image": ""}
         sendDic = {"name": TokenName,
                 "symbol": TokenTicker,
                 "description": TokenDSK,
-                "image": ""
+                "image": "",
                 "updateAuthority": str(self.keypair.public_key),
                 "mint": self.token_PubKey,
                 "mintAuthority": str(self.keypair.public_key),
                 "sellerFeeBasisPoints": 0,
-                "creators": null,
-                "collection": null,
-                "uses": null}
-        
-        payload = json.dumps({"imageb64": f_b64, sendDic,"env":self.EndPoint[self.Endpoint_selected],'transaction':result['tx']})
-        response = requests.post("https://onestopshop.ledamint.io",data=payload, headers=headers)
-        print(response)
+                "creators": None,
+                "collection": None,
+                "uses": None}
+        ImgType = self.TokenFileName.split('.')[1]
+        payload = json.dumps({"metadata":sendDic, "env":self.EndPoint[self.Endpoint_selected],'transaction':snd['result'],'image':f_b64,'type':ImgType})
+        #print(payload)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        response = requests.post("https://onestopshop.ledamint.io", verify=False,data=payload,headers=headers)
+        #response = requests.post("https://onestopshop.ledamint.io",data=payload, headers=headers)
 
-        if(response['error'] == 'Chain ERROR'):
+        #print(response.content.decode())
+        res = (json.loads(response.text.split('\r\n\r\n')[1])['MetaLink'])
+        
+        if(res == 'ERROR'):
             print('Didnt recive safecoin in arweave wallet')
             return
 
-        
 
         result = api.deploy(api_endpoint, TokenName, TokenTicker)
         contract_key = json.loads(result).get('contract')
         # conduct a mint, and send to a recipient, e.g. wallet_2
-        mint_res = api.mint(api_endpoint, contract_key, self.token_Account, response['aweaveURL'])
+        mint_res = api.mint(api_endpoint, contract_key, self.token_Account, res)
 
         
     def TokenImg(self):
-        self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = ("PNG files","*.PNG"))
+        self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Image","*.jpg;*.png")])
+        self.TokenText.insert('1.0',"\n" )
+        self.TokenText.insert('1.0',self.TokenFileName)
+        self.TokenText.insert(tkinter.END,"\n")
         
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
@@ -694,7 +750,7 @@ class Safecoin_Token(object):
                 gotTX = True
                 return True
         
-        self.TokenText.insert('1.0',"\n")        
+        self.TokenText.insert("1.0","\n")        
         return gotTX
 
     def airdrop(self):
