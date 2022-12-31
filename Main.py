@@ -239,6 +239,8 @@ class Safecoin_Token(object):
         self.ValStakeBTN.place_forget()
         self.LrgAccountsBTN.place_forget()
         self.NFTDescLB.place_forget()
+        self.addTokeBurnBTN.place_forget()
+        self.TKNBurnAmount.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
