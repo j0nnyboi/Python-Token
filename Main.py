@@ -739,7 +739,7 @@ class Safecoin_Token(object):
 
         
     def TokenImg(self):
-        self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("Image","*.jpg;*.png")])
+        self.TokenFileName = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = [("PNG", "*.png"), ("JPEG", "*.jpg")])
         self.TokenText.insert('1.0',"\n" )
         self.TokenText.insert('1.0',self.TokenFileName)
         self.TokenText.insert('1.0',"\n")
