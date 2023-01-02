@@ -133,6 +133,8 @@ class Safecoin_Token(object):
         self.ValStakeBTN = customtkinter.CTkButton(self.top, text ='Validator Stake info', command = self.GetValStake)
         self.ClearTxtBTN = customtkinter.CTkButton(self.top, text ='Clear', command = self.ClearTxt)
         self.LrgAccountsBTN = customtkinter.CTkButton(self.top, text ='Get Largest Accounts', command = self.LrgAcc)
+
+        self.CloseAccountsBTN = customtkinter.CTkButton(self.top, text ='Close Account', command = self.CloseAcc)
         
     def Run(self):
         self.HomePage()
@@ -235,12 +237,13 @@ class Safecoin_Token(object):
         self.addTokeRegBTN.place_forget()
         self.ChainMonBTN.place_forget()
         self.ValInfoBTN.place_forget()
-        self.TokenText.delete(tkinter.END)
+        #self.TokenText.delete(tkinter.END)
         self.ValStakeBTN.place_forget()
         self.LrgAccountsBTN.place_forget()
         self.NFTDescLB.place_forget()
         self.addTokeBurnBTN.place_forget()
         self.TKNBurnAmount.place_forget()
+        self.CloseAccountsBTN.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -454,6 +457,18 @@ class Safecoin_Token(object):
         self.token_PubKey = self.token_client.pubkey
         return self.token_client
 
+
+    def CloseAcc(self):
+        print("closeing account")
+        tx = self.TokenACCOUNT.close_account(account='2EArmiMp3nPWy4KD6JALr5KtLvdWchrLiocKf1K9ExbF',dest='ECoS9fGJ7Ux4UgGq2WmHyau2oDMmPTxbMUUVRa5CYNik',authority=self.keypair)
+
+        print(tx)
+        gotTX = self.await_TXN_full_confirmation(self.client,tx['result'])
+        if(gotTX):
+            self.TokenText.insert('1.0',"Closed Account")       
+        else:
+            self.TokenText.insert('1.0',"Close Failed\n")
+        
     def loadToken(self):
         
         token_PubKey = self.TokenLoadBox.get()
@@ -482,6 +497,7 @@ class Safecoin_Token(object):
         self.MintAntLB.place(x=10, y=170)
         self.MintBtn.place(x=100, y=200)
         self.AmountBox.place(x=100, y=170)
+        self.CloseAccountsBTN.place(x=10, y=230)
         self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
         self.TokenLoadLB.place_forget()
