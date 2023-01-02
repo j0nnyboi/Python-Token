@@ -460,7 +460,7 @@ class Safecoin_Token(object):
 
     def CloseAcc(self):
         print("closeing account")
-        tx = self.TokenACCOUNT.close_account(account='2EArmiMp3nPWy4KD6JALr5KtLvdWchrLiocKf1K9ExbF',dest='ECoS9fGJ7Ux4UgGq2WmHyau2oDMmPTxbMUUVRa5CYNik',authority=self.keypair)
+        tx = self.TokenACCOUNT.close_account(account=self.token_Account,dest=self.keypair.public_key,authority=self.keypair)
 
         print(tx)
         gotTX = self.await_TXN_full_confirmation(self.client,tx['result'])
@@ -497,7 +497,7 @@ class Safecoin_Token(object):
         self.MintAntLB.place(x=10, y=170)
         self.MintBtn.place(x=100, y=200)
         self.AmountBox.place(x=100, y=170)
-        self.CloseAccountsBTN.place(x=10, y=230)
+        self.CloseAccountsBTN.place(x=10, y=320)
         self.AmountBox.delete(0,tkinter.END)
         self.AmountBox.insert(tkinter.END,"10")
         self.TokenLoadLB.place_forget()
