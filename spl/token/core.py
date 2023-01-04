@@ -552,7 +552,12 @@ class _TokenCore:  # pylint: disable=too-few-public-methods
         else:
             owner_pubkey = owner
             signers = multi_signers if multi_signers else []
-
+        print(self.program_id,
+                    account,
+                    self.pubkey,
+                    owner_pubkey,
+                    amount,
+                    [signer.public_key for signer in signers])
         txn = Transaction().add(
             spl_token.burn(
                 spl_token.BurnParams(
