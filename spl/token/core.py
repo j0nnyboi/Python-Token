@@ -541,7 +541,7 @@ class _TokenCore:  # pylint: disable=too-few-public-methods
     def _burn_args(
         self,
         account: PublicKey,
-        owner: Union[PublicKey, Keypair],
+        owner: Union[Keypair,PublicKey],
         amount: int,
         multi_signers: Optional[List[Keypair]],
         opts: TxOpts = TxOpts(),

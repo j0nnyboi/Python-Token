@@ -127,12 +127,17 @@ class Safecoin_Token(object):
         self.addTokeRegBTN = customtkinter.CTkButton(self.top, text ='Redgister Token', command = self.Tokenreq)
         self.addTokeBurnBTN = customtkinter.CTkButton(self.top, text ='Token Burn', command = self.TokenBurn)
         self.TKNBurnAmount = customtkinter.CTkEntry(self.top,height = 25, width = 150,placeholder_text="Burn Amount")
+        self.FreezeBTN = customtkinter.CTkButton(self.top, text ='Token Freeze', command = self.TokenFreeze)
+        self.ThawBTN = customtkinter.CTkButton(self.top, text ='Token Thaw', command = self.TokenThaw)
+
         
         self.ChainMonBTN = customtkinter.CTkButton(self.top, text ='Chain Monitor', command = self.ChainMonitor)
         self.ValInfoBTN = customtkinter.CTkButton(self.top, text ='Validator Info', command = self.GetValidators)
         self.ValStakeBTN = customtkinter.CTkButton(self.top, text ='Validator Stake info', command = self.GetValStake)
         self.ClearTxtBTN = customtkinter.CTkButton(self.top, text ='Clear', command = self.ClearTxt)
         self.LrgAccountsBTN = customtkinter.CTkButton(self.top, text ='Get Largest Accounts', command = self.LrgAcc)
+
+        
         
     def Run(self):
         self.HomePage()
@@ -241,6 +246,8 @@ class Safecoin_Token(object):
         self.NFTDescLB.place_forget()
         self.addTokeBurnBTN.place_forget()
         self.TKNBurnAmount.place_forget()
+        self.FreezeBTN.place_forget()
+        self.ThawBTN.place_forget()
         self.TKNorNFT=0
         self.HomePage()
     
@@ -421,7 +428,7 @@ class Safecoin_Token(object):
             expected_decimals,
             TOKEN_PROGRAM_ID,
             skip_confirmation = True,
-            #freeze_authority.public_key,
+            freeze_authority = self.keypair.public_key,
         )
         print(self.token_client.pubkey)
         resp = self.client.get_account_info(self.token_client.pubkey)
@@ -451,6 +458,8 @@ class Safecoin_Token(object):
         self.TokenLoadAccBox.place(x=150, y=170)
         self.TokenLoadAccbtn.place(x=100, y=200)
         self.TokenLoadlb.place(x=10, y=170)
+        self.FreezeBTN.place(x=10, y=300)
+        self.ThawBTN.place(x=10, y=330)
         self.token_PubKey = self.token_client.pubkey
         return self.token_client
 
@@ -495,12 +504,13 @@ class Safecoin_Token(object):
         self.GetTokenBalbtn.place(x=10, y=130)
         self.addTokeBurnBTN.place(x=10, y=270)
         self.TKNBurnAmount.place(x=200, y=270)
+        self.FreezeBTN.place(x=10, y=300)
+        self.ThawBTN.place(x=10, y=330)
         
         
     def CreateAcount(self):
         self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
         print(self.token_PubKey)
-        
         self.TokenLoadLB.place_forget()
         self.TokenLoadBox.place_forget()
         self.TokenLoadbtn.place_forget()
@@ -508,7 +518,7 @@ class Safecoin_Token(object):
         self.TokenLoadAccBox.place_forget()
         self.TokenLoadAccbtn.place_forget()
         
-        self.token_Account = self.TokenACCOUNT.create_account(self.token_PubKey,skip_confirmation = True)
+        self.token_Account = self.TokenACCOUNT.create_associated_token_account(self.token_PubKey,skip_confirmation = True)
         print(self.token_Account)
         resp = self.client.get_account_info(self.token_Account)
         amount = 0
@@ -553,7 +563,8 @@ class Safecoin_Token(object):
         else:
             self.TokenText.insert('1.0',"Token Ballance Error, please check keypairs \n")
 
-
+    #26dhPSbqucjpuyaxsrucav93Av9AAeq5sz4aRFZMQAHz
+    #8DwbfHPqg7AWwpbPKGstKpnzosxBDroS5kr7LWLSbhdR
     def TokenBurn(self):
         burnAmount = int(self.TKNBurnAmount.get())
         tx = self.TokenACCOUNT.burn(account=self.token_Account,owner=self.keypair,amount=burnAmount)
@@ -607,6 +618,47 @@ class Safecoin_Token(object):
             self.TokenText.insert('1.0',"please just use numbers")
             #self.TokenText.see("end")
             self.top.update()
+    def TokenFreeze(self):
+        self.popupFreezeWindow = customtkinter.CTkToplevel()
+        self.popupFreezeWindow.geometry("400x200")
+        self.popupFreezeWindow.wm_title("Are You Sure")
+        labelBonus = customtkinter.CTkLabel(self.popupFreezeWindow, text="Are you sure you want to freeze")
+        B2 = customtkinter.CTkButton(self.popupFreezeWindow, text="Yes", command=self.FreezeToken)
+        B1 = customtkinter.CTkButton(self.popupFreezeWindow, text="No", command=self.popupFreezeWindow.destroy)
+        B1.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+        B2.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+
+    def FreezeToken(self):
+        self.popupFreezeWindow.destroy()
+        resp = self.TokenACCOUNT.freeze_account(account=self.token_PubKey,authority=self.keypair)
+        print(resp)
+        gotTX = self.await_TXN_full_confirmation(self.client,resp['result'])
+        if(gotTX):
+            self.TokenText.insert('1.0',"Token Frozen \n")       
+        else:
+            print("Freeze Failed")
+            self.TokenText.insert('1.0',"Freeze Failed\n")
+            
+    def TokenThaw(self):
+        self.popupThawWindow = customtkinter.CTkToplevel()
+        self.popupThawWindow.geometry("400x200")
+        self.popupThawWindow.wm_title("Are You Sure")
+        labelBonus = customtkinter.CTkLabel(self.popupThawWindow, text="Are you sure you want to Thaw")
+        B2 = customtkinter.CTkButton(self.popupThawWindow, text="Yes", command=self.FreezeToken)
+        B1 = customtkinter.CTkButton(self.popupThawWindow, text="No", command=self.popupThawWindow.destroy)
+        B1.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+        B2.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+
+    def ThawToken(self):
+        self.popupThawWindow.destroy()
+        resp = self.TokenACCOUNT.thaw_account(account=self.token_Account,authority=self.keypair)
+        print(resp)
+        gotTX = self.await_TXN_full_confirmation(self.client,resp['result'])
+        if(gotTX):
+            self.TokenText.insert('1.0',"Token Thawed \n")       
+        else:
+            print("Thaw Failed")
+            self.TokenText.insert('1.0',"Thaw Failed\n")
 
     def TokenReg(self):
         self.MintAntLB.place_forget()
