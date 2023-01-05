@@ -25,7 +25,7 @@
     <meta property="og:type" content="website">
   </head>
   <body class="u-body u-xl-mode" data-lang="en"><header class="u-clearfix u-header u-header" id="sec-daff"><div class="u-clearfix u-sheet u-sheet-1">
-        <a href="https://nicepage.com" class="u-image u-logo u-image-1" data-image-width="2400" data-image-height="500">
+        <a href="https://market.ledamint.io" class="u-image u-logo u-image-1" data-image-width="2400" data-image-height="500">
           <img src="{% static 'images/H_Ledamint_bicolor.jpg' %}" class="u-logo-image u-logo-image-1">
         </a>
         <nav class="u-menu u-menu-one-level u-offcanvas u-menu-1">
@@ -37,28 +37,28 @@
             </a>
           </div>
           <div class="u-custom-menu u-nav-container">
-            <ul class="u-nav u-unstyled u-nav-1"><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="Home.html" style="padding: 10px 20px;">Home</a>
-</li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="NFTs.html" style="padding: 10px 20px;">NFTs</a>
-</li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="Token.html" style="padding: 10px 20px;">Token</a>
+            <ul class="u-nav u-unstyled u-nav-1"><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'Home' %}" style="padding: 10px 20px;">Home</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'NFTs' %}" style="padding: 10px 20px;">NFTs</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'Token' %}" style="padding: 10px 20px;">Token</a>
 </li></ul>
           </div>
           <div class="u-custom-menu u-nav-container-collapse">
             <div class="u-black u-container-style u-inner-container-layout u-opacity u-opacity-95 u-sidenav">
               <div class="u-inner-container-layout u-sidenav-overflow">
                 <div class="u-menu-close"></div>
-                <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"><li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html">Home</a>
-</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="NFTs.html">NFTs</a>
-</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="Token.html">Token</a>
+                <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"><li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'Home' %}">Home</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'NFTs' %}">NFTs</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'Token' %}">Token</a>
 </li></ul>
               </div>
             </div>
             <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
           </div>
         </nav>
-        <a href="https://nicepage.com" class="u-image u-logo u-image-2" data-image-width="520" data-image-height="567">
-          <img src="{% static 'images/SafeCoin_Icon.png' %} class="u-logo-image u-logo-image-2">
+        <a href="https://safecoin.org" class="u-image u-logo u-image-2" data-image-width="520" data-image-height="567">
+          <img src="{% static 'images/SafeCoin_Icon.png' %}" class="u-logo-image u-logo-image-2">
         </a>
-        <a href="http://127.0.0.1:8000/wallet" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
+        <a href="{% url 'Wallet' %}" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
       </div></header>
     <section class="u-clearfix u-section-1" id="sec-fb3f">
       <div class="u-clearfix u-sheet u-sheet-1">

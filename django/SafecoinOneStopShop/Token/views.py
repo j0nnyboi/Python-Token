@@ -2,13 +2,13 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
+from SafeConnect import SafeToken
 
 def index(request):
     #print(request.POST)
     return render(request, "Home.html")
 
-def Token(request):
+def Wallet(request):
+    
     return HttpResponse("Token")
 
-def images(request):
-    return render(request, "images/SafeCoin_Icon.png")

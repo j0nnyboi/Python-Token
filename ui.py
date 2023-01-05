@@ -1,10 +1,6 @@
 import customtkinter
 import tkinter
-
-class OnestopShopUI(object):
-    def __init__(self):
-        
-        import argparse
+import argparse
 import string
 import random
 import json
