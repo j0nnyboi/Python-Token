@@ -11,4 +11,5 @@ urlpatterns = [
     path('Token/', TemplateView.as_view(template_name='Token.html'),
          name='Token'),
     path('Wallet/', views.Wallet, name='Wallet'),
+    path('WalletNew/', views.WalletNew, name='WalletNew'),
 ]

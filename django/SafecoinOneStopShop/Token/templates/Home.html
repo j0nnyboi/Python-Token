@@ -58,7 +58,8 @@
         <a href="https://safecoin.org" class="u-image u-logo u-image-2" data-image-width="520" data-image-height="567">
           <img src="{% static 'images/SafeCoin_Icon.png' %}" class="u-logo-image u-logo-image-2">
         </a>
-        <a href="{% url 'Wallet' %}" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
+		{% csrf_token %}
+        <a onclick = "WalletCheck()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
       </div></header>
     <section class="u-clearfix u-section-1" id="sec-fb3f">
       <div class="u-clearfix u-sheet u-sheet-1">
@@ -74,4 +75,6 @@
         <p class="u-text u-text-default u-text-1">Build by J0nnyboi, any question, issues or upgrades please message me on discord at&nbsp;jonnyboi#6682&nbsp;</p>
       </div></footer>
   
-</body></html>
+</body>
+<script src="{% static 'main.js' %}"></script>
+</html>
