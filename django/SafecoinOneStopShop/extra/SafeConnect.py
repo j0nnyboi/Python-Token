@@ -26,3 +26,35 @@ class SafeToken(object):
         self.api_endpoint = self.EndPoint['Mainnet']
         self.Endpoint_selected = 'Mainnet'
         self.keypair = ""
+        self.wallet_connected = False
+
+    def WalletConnect(self):
+        with open('KeyPair.json', 'r') as KP:
+            keypairStr = KP.read()
+        keypairStr = keypairStr.split("[")
+        keypairStr = keypairStr[1].split("]")
+        keypairStr = keypairStr[0].split(",")
+        keypairStr = keypairStr[0:32]
+        print(keypairStr)
+        keypairlst = [int(x) for x in keypairStr]
+        
+        self.client = Client(self.EndPoint[self.Endpoint_selected])
+
+    def walletNew(self):
+        self.keypair = Keypair()
+        print([b for b in self.keypair.seed])
+        #print(self.keypair.secret_key)
+        print(self.keypair.seed)
+        print(self.keypair.public_key)
+        print(int.from_bytes(self.keypair.seed, "little"))
+        with open('KeyPair.json', 'w') as file:
+            file.write(str([b for b in self.keypair.seed]))
+            
+        self.client = Client(self.EndPoint[self.Endpoint_selected])
+
+    def deleteKey(self):
+        os.remove('KeyPair.json')
+        self.wallet_connected = False
+        
+
+        

@@ -58,7 +58,7 @@
         <a href="https://safecoin.org" class="u-image u-logo u-image-2" data-image-width="520" data-image-height="567">
           <img src="{% static 'images/SafeCoin_Icon.png' %}" class="u-logo-image u-logo-image-2">
         </a>
-        <a href="{% url 'Wallet' %}" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
+        <a href="http://127.0.0.1:8000/wallet" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow">Wallet Connect</a>
       </div></header>
     <section class="u-clearfix u-section-1" id="sec-33e8">
 	<form method="POST">    

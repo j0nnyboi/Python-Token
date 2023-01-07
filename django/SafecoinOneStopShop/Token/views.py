@@ -9,6 +9,6 @@ def index(request):
     return render(request, "Home.html")
 
 def Wallet(request):
-    
+    SafeToken.WalletConnect()
     return HttpResponse("Token")
 
