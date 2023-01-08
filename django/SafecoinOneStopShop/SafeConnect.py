@@ -24,13 +24,14 @@ class SafeToken(object):
                     "Testnet":"https://api.testnet.safecoin.org",
                     "Devnet":"https://api.devnet.safecoin.org"}
         self.api_endpoint = self.EndPoint['Mainnet']
-        self.Endpoint_selected = 'Mainnet'
+        self.Endpoint_selected = 'Testnet'
         self.keypair = ""
         self.wallet_connected = False
 
     def WalletConnect(self,keypairStr):
         #with open('KeyPair.json', 'r') as KP:
         #    keypairStr = KP.read()
+        print(keypairStr)
         keypairStr = keypairStr.split("[")
         keypairStr = keypairStr[1].split("]")
         keypairStr = keypairStr[0].split(",")
@@ -58,6 +59,41 @@ class SafeToken(object):
 
     def deleteKey(self):
         self.wallet_connected = False
+
+    def NewToken(self):
+        expected_decimals = 6
+        self.token_client = Token.create_mint(
+            self.client,
+            self.keypair,
+            self.keypair.public_key,
+            expected_decimals,
+            TOKEN_PROGRAM_ID,
+            skip_confirmation = True,
+            freeze_authority = self.keypair.public_key,
+        )
+        print(self.token_client.pubkey)
+        resp = self.client.get_account_info(self.token_client.pubkey)
+        amount = 0
+        while resp["result"]["value"] == None:
+                print(resp)
+                resp = self.client.get_account_info(self.token_client.pubkey)
+                self.top.update()
+                time.sleep(1)
+                amount += 1
+                if(amount > 100):
+                    print("Creating a token Failed Please try again \n")
+                    return
+                    
+                
+        print(resp)
+        assert self.token_client.pubkey
+        assert self.token_client.program_id == TOKEN_PROGRAM_ID
+        assert self.token_client.payer.public_key == self.keypair.public_key
+        assert resp["result"]["value"]["owner"] == str(TOKEN_PROGRAM_ID)
+        Print("Token address = %s \n" % self.token_client.pubkey)
+        self.token_PubKey = self.token_client.pubkey
+        return self.token_PubKey
+        
         
 
         

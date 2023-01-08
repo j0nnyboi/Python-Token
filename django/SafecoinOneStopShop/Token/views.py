@@ -6,7 +6,7 @@ from SafeConnect import SafeToken
 ST = SafeToken()
 def index(request):
     #print(request.POST)
-    return render(request, "Home.html")
+    return render(request, "header.html")
 
 def Wallet(request):
     print(request.POST.get("keypair", ""))
@@ -21,3 +21,7 @@ def WalletNew(request):
     print('Keypair : ',keypair.seed)
     print([b for b in keypair.seed])
     return HttpResponse(str([b for b in keypair.seed]))
+
+def NewToken(request):
+    TokenPubKey = ST.NewToken()
+    return HttpResponse(str(TokenPubKey))
