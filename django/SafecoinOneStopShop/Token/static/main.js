@@ -6,17 +6,21 @@ NFT.style.display = "none";
 	
 function WalletCheck(){
 if(!localStorage.getItem('Keypair')) {
-  popupWindow = window.open(
-		'WalletPopup/','popUpWindow','height=300,width=400,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
-  populateKeypair();
+	$("#walletpopup").show();
+	console.log('wallet popup');
+  //popupWindow = window.open(
+//		'WalletPopup/','popUpWindow','height=300,width=400,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+  //populateKeypair();
 } else {
   setKeypair();
   
 }
 }
 
-function populateKeypair() {
+
+function CreateWallet() {
   /*get new key and save client side*/
+  $("#walletpopup").hide();
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   $.ajax({
 	  headers: {'X-CSRFToken': csrftoken},
@@ -37,6 +41,16 @@ function populateKeypair() {
   console.log('Wallet Saved');
 
 }
+
+function ImportWallet(){
+	$("#walletpopup").hide();
+	const val = document.getElementById('importKeypair').value;
+	//console.log(val);
+	localStorage.setItem('Keypair', val);
+	setKeypair()
+}
+
+
 
 function setKeypair() {
   var currentKey = localStorage.getItem('Keypair');/*get client stored keypair*/
