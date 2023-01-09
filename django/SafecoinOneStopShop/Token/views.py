@@ -42,3 +42,7 @@ def ChangeChain(request):
 def Balance(request):
     (bal, SafeValue, BWorth) = ST.Balance()
     return JsonResponse({'bal':bal,'SafeValue':SafeValue,'BWorth':BWorth})
+
+def airdrop(request):
+    tx = ST.airdrop()
+    return HttpResponse(tx)

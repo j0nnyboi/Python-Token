@@ -9,4 +9,5 @@ urlpatterns = [
     path('NewToken/', views.NewToken, name='NewToken'),
     path('ChangeChain/', views.ChangeChain, name='ChangeChain'),
     path('Balance/', views.Balance, name='Balance'),
+    path('Airdrop/', views.airdrop, name='airdrop'),
 ]

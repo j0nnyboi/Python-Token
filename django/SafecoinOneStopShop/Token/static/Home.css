@@ -86,6 +86,10 @@ section {
     margin-bottom: 20px;
   }
 }
+#walletBalance {
+  text-align: center;
+
+}
 
 button {
   @include experimental('appearance', 

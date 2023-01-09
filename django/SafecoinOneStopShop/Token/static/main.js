@@ -3,7 +3,9 @@ var Token = document.getElementById("sec-33e8");
 Token.style.display = "none";
 var NFT = document.getElementById("sec-353e");
 NFT.style.display = "none";
-	
+var Airbtn = document.getElementById("Airdropbtn");
+Airbtn.style.display = "none";
+
 function WalletCheck(){
 if(!localStorage.getItem('Keypair')) {
 	$("#walletpopup").show();
@@ -103,24 +105,6 @@ function NFTPage(){
 	
 }
 
-	
-function NewToken() {
-  /*get new key and save client side*/
-  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  $.ajax({
-	  headers: {'X-CSRFToken': csrftoken},
-   type: "GET",
-   url: "NewToken/",
-   data: {},
-   success: function callback(response){
-               console.log(response);
-			   //var btn = document.getElementById("WalletBtn");
-			   //btn.innerText=response;
-			   //document.getElementById("WalletBtn").value=;
-            }
-});
-
-}
 
 var main = document.getElementById('Mainnet');
 var test = document.getElementById('Testnet');
@@ -142,24 +126,29 @@ function Chain(chain){
                 var main = document.getElementById('Mainnet');
 			    var test = document.getElementById('Testnet');
 				var dev = document.getElementById('Devnet');
+				var Airbtn = document.getElementById("Airdropbtn");
+
 				if(response['endpoint'] == 'Connection Error Mainnet'){
 					main.style.color = '#FF0000'; 
 					test.style.color = '#000000';  
 					dev.style.color = '#000000'; 
 					alert(response['endpoint']);
 					document.getElementById("walletBalance").innerHTML = 0;
+					Airbtn.style.display = "none";
 				}else if(response['endpoint'] == 'Connection Error Testnet'){
 					main.style.color = '#000000'; 
 					test.style.color = '#FF0000';  
 					dev.style.color = '#000000';
 					alert(response['endpoint']);
 					document.getElementById("walletBalance").innerHTML = 0;
+					Airbtn.style.display = "none";
 				}else if(response['endpoint'] == 'Connection Error Devnet'){
 					main.style.color = '#000000'; 
 					test.style.color = '#000000';  
 					dev.style.color = '#FF0000';
 					alert(response['endpoint']);
 					document.getElementById("walletBalance").innerHTML = 0;
+					Airbtn.style.display = "none";
 				
 				}else{
 					console.log(response['endpoint']);
@@ -167,15 +156,18 @@ function Chain(chain){
 					if(chain == 'Mainnet'){
 						main.style.color = '#6bf2b3'; 
 						test.style.color = '#000000';  
-						dev.style.color = '#000000';  					
+						dev.style.color = '#000000';  
+						Airbtn.style.display = "none";						
 					}else if (chain == 'Testnet'){
 						main.style.color = '#000000'; 
 						test.style.color = '#6bf2b3';  
 						dev.style.color = '#000000';
+						Airbtn.style.display = "block";
 				}else if (chain == 'Devnet'){
 						main.style.color = '#000000'; 
 						test.style.color = '#000000';  
 						dev.style.color = '#6bf2b3';
+						Airbtn.style.display = "block";
 				}
             }
    }
@@ -192,8 +184,44 @@ function BalanceShow(){
    url: "Balance/",
    data: {},
    success: function callback(response){
-	document.getElementById("walletBalance").innerHTML = response['bal'];
+	   var balstr = (response['bal'] + ' Safe  ' + '$' + response['BWorth'])
+	   document.getElementById("walletBalance").innerHTML = balstr;
 	
    }
 });
+}
+
+function Airdrop(){
+	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "Airdrop/",
+   data: {},
+   success: function callback(response){
+	   console.log(response)
+	  alert('Airdrop tx : ' + response);
+	  BalanceShow()
+   }
+});
+}
+
+
+function NewToken() {
+  /*get new key and save client side*/
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "GET",
+   url: "NewToken/",
+   data: {},
+   success: function callback(response){
+               console.log(response);
+			   alert('Token PubKey : ' + response);
+			   //var btn = document.getElementById("WalletBtn");
+			   //btn.innerText=response;
+			   //document.getElementById("WalletBtn").value=;
+            }
+});
+
 }

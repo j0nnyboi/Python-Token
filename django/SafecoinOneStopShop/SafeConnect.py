@@ -25,7 +25,7 @@ class SafeToken(object):
                     "Testnet":"https://api.testnet.safecoin.org",
                     "Devnet":"https://api.devnet.safecoin.org"}
         self.api_endpoint = self.EndPoint['Mainnet']
-        self.Endpoint_selected = 'Testnet'
+        self.Endpoint_selected = 'Mainnet'
         self.keypair = ""
         self.wallet_connected = False
 
@@ -102,7 +102,7 @@ class SafeToken(object):
         assert self.token_client.program_id == TOKEN_PROGRAM_ID
         assert self.token_client.payer.public_key == self.keypair.public_key
         assert resp["result"]["value"]["owner"] == str(TOKEN_PROGRAM_ID)
-        Print("Token address = %s \n" % self.token_client.pubkey)
+        print("Token address = %s \n" % self.token_client.pubkey)
         self.token_PubKey = self.token_client.pubkey
         return self.token_PubKey
 
@@ -123,6 +123,39 @@ class SafeToken(object):
             self.client = Client(self.EndPoint[self.Endpoint_selected])
             return 0
         
+    def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
+        if txn is None:
+            return False
+        elapsed = 0
+        gotTX = False
+        while elapsed < max_timeout:
+            sleep_time = 1
+            time.sleep(sleep_time)
+            elapsed += sleep_time
+            resp = self.client.get_confirmed_transaction(txn)
+            print(resp)
+            if resp["result"]:
+                print(f"Took {elapsed} seconds to confirm transaction {txn}")
+                gotTX = True
+                return True
+
+        return gotTX
+
+    def airdrop(self):
+        resp = {}
+        if(self.client.is_connected()):
+            while 'result' not in resp:
+                resp = self.client.request_airdrop(self.keypair.public_key,1000000000)
+            txn = resp['result']
+            self.await_TXN_full_confirmation(self.client, txn)
+            print(resp)
+            print("Topup complete")
+            return txn
+        else:
+            print("not connected to %s"%self.api_endpoint)
+            return None
         
+
+    
 
         
