@@ -74,7 +74,7 @@
 		{% csrf_token %}
         <a onclick = "WalletCheck()" id="WalletBtn" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow" value="Wallet Connect" >Wallet Connect</a>
 		
-	   <a onclick = "Airdrop()" id="Airdropbtn" class="u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50" rel="nofollow" >Airdrop</a>
+	   <a onclick = "Airdrop()" id="Airdropbtn" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50" rel="nofollow" >Airdrop</a>
 	   <h6 id='walletBalance'></h6>
 	   
 	   {% include "WalletPopup.html" %}   

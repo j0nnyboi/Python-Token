@@ -14517,7 +14517,6 @@ div.u-video,
   padding: 0;
   margin: 0;
   height: 100%;
-  cursor: pointer;
 }
 .u-nav-popup .u-nav-item {
   height: auto;
