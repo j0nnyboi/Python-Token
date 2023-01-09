@@ -28,6 +28,9 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = ['onestopshop.ledamint.io']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://onestopshop.ledamint.io",
+]
 
 # Application definition
 
