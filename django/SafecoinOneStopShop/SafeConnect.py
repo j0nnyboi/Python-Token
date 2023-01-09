@@ -28,11 +28,22 @@ class SafeToken(object):
         self.keypair = ""
         self.wallet_connected = False
 
+    def ChangeEndpoint(self,endpoint):
+        #print("Endpoint Changed: ",endpoint)
+        self.client = Client(self.EndPoint[endpoint])
+        if(self.client.is_connected()):
+            return endpoint
+        else:
+            return("Connection Error %s" % endpoint)
+        
+
     def WalletConnect(self,keypairStr):
         #with open('KeyPair.json', 'r') as KP:
         #    keypairStr = KP.read()
         print(keypairStr)
+        print('here')
         keypairStr = keypairStr.split("[")
+        print(keypairStr)
         keypairStr = keypairStr[1].split("]")
         keypairStr = keypairStr[0].split(",")
         keypairStr = keypairStr[0:32]
@@ -45,11 +56,12 @@ class SafeToken(object):
 
     def walletNew(self):
         self.keypair = Keypair()
+        print('newKey')
         print([b for b in self.keypair.seed])
         #print(self.keypair.secret_key)
         print(self.keypair.seed)
         print(self.keypair.public_key)
-        print(int.from_bytes(self.keypair.seed, "little"))
+        #print(int.from_bytes(self.keypair.seed, "little"))
         #with open('KeyPair.json', 'w') as file:
         #    file.write(str([b for b in self.keypair.seed]))
           
@@ -77,7 +89,6 @@ class SafeToken(object):
         while resp["result"]["value"] == None:
                 print(resp)
                 resp = self.client.get_account_info(self.token_client.pubkey)
-                self.top.update()
                 time.sleep(1)
                 amount += 1
                 if(amount > 100):

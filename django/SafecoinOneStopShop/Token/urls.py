@@ -7,4 +7,5 @@ urlpatterns = [
     path('Wallet/', views.Wallet, name='Wallet'),
     path('WalletNew/', views.WalletNew, name='WalletNew'),
     path('NewToken/', views.NewToken, name='NewToken'),
+    path('ChangeChain/', views.ChangeChain, name='ChangeChain'),
 ]

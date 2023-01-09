@@ -28,17 +28,19 @@ function CreateWallet() {
    url: "WalletNew/",
    data: {},
    success: function callback(response){
-               //console.log(response);
-			   localStorage.setItem('Keypair', response);
+               console.log(response);
+			   localStorage.setItem('Keypair', response['seed']);
 			   //var btn = document.getElementById("WalletBtn");
 			   //btn.innerText=response;
 			   //document.getElementById("WalletBtn").value=;
+			   var btn = document.getElementById("WalletBtn");
+					btn.innerText=response['pubkey'];
             }
 });
   
   //save
-  setKeypair()
   console.log('Wallet Saved');
+ 
 
 }
 
@@ -47,7 +49,6 @@ function ImportWallet(){
 	const val = document.getElementById('importKeypair').value;
 	//console.log(val);
 	localStorage.setItem('Keypair', val);
-	setKeypair()
 }
 
 
@@ -117,4 +118,66 @@ function NewToken() {
             }
 });
 
+}
+
+var main = document.getElementById('Mainnet');
+var test = document.getElementById('Testnet');
+var dev = document.getElementById('Devnet');
+main.style.color = '#6bf2b3'; 
+test.style.color = '#000000';  
+dev.style.color = '#000000';  
+						
+function Chain(chain){
+	//console.log("chain change");
+	//console.log(chain);
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "ChangeChain/",
+   data: {'chain':chain},
+   success: function callback(response){
+                var main = document.getElementById('Mainnet');
+			    var test = document.getElementById('Testnet');
+				var dev = document.getElementById('Devnet');
+				if(response['endpoint'] == 'Connection Error Mainnet'){
+					main.style.color = '#FF0000'; 
+					test.style.color = '#000000';  
+					dev.style.color = '#000000'; 
+					alert(response['endpoint']);
+					
+				}else if(response['endpoint'] == 'Connection Error Testnet'){
+					main.style.color = '#000000'; 
+					test.style.color = '#FF0000';  
+					dev.style.color = '#000000';
+					alert(response['endpoint']);
+					
+				}else if(response['endpoint'] == 'Connection Error Devnet'){
+					main.style.color = '#000000'; 
+					test.style.color = '#000000';  
+					dev.style.color = '#FF0000';
+					alert(response['endpoint']);
+					
+				
+				}else{
+					console.log(response['endpoint']);
+					
+					if(chain == 'Mainnet'){
+						main.style.color = '#6bf2b3'; 
+						test.style.color = '#000000';  
+						dev.style.color = '#000000';  					
+					}else if (chain == 'Testnet'){
+						main.style.color = '#000000'; 
+						test.style.color = '#6bf2b3';  
+						dev.style.color = '#000000';
+				}else if (chain == 'Devnet'){
+						main.style.color = '#000000'; 
+						test.style.color = '#000000';  
+						dev.style.color = '#6bf2b3';
+				}
+            }
+   }
+});
+	
+	
 }

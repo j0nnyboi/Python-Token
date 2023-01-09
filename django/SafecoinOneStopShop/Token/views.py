@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 
 from SafeConnect import SafeToken
 ST = SafeToken()
@@ -16,7 +16,7 @@ def WalletPopup(request):
 def Wallet(request):
     print(request.POST.get("keypair", ""))
     keypair = request.POST.get("keypair", "")
-    print("keypair: ",keypair)
+    print("keypair wallet: ",keypair)
     Keypair = ST.WalletConnect(keypair)
     print("pubkey: ",Keypair.public_key)
     return HttpResponse(str(Keypair.public_key))
@@ -24,10 +24,18 @@ def Wallet(request):
 
 def WalletNew(request):
     keypair = ST.walletNew()
-    print('Keypair : ',keypair.seed)
+    print('Keypair new : ',keypair.seed)
     print([b for b in keypair.seed])
-    return HttpResponse(str([b for b in keypair.seed]))
+    return JsonResponse({'seed':str([b for b in keypair.seed]),'pubkey':str(keypair.public_key)})
 
 def NewToken(request):
     TokenPubKey = ST.NewToken()
     return HttpResponse(str(TokenPubKey))
+
+
+def ChangeChain(request):
+    chain = request.POST.get("chain", None)
+    #print("Chain: ",chain)
+    endpoint = ST.ChangeEndpoint(chain)
+    print('endpoint : ',endpoint)
+    return JsonResponse({'endpoint':endpoint})
