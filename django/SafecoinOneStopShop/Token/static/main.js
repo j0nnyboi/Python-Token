@@ -35,6 +35,7 @@ function CreateWallet() {
 			   //document.getElementById("WalletBtn").value=;
 			   var btn = document.getElementById("WalletBtn");
 					btn.innerText=response['pubkey'];
+				BalanceShow()
             }
 });
   
@@ -67,6 +68,7 @@ function setKeypair() {
 			   var btn = document.getElementById("WalletBtn");
 			   btn.innerText=response;
 			   //document.getElementById("WalletBtn").value=response;
+			   BalanceShow()
             }
 });
   /*document.getElementById('Keypair').value = currentColor;*/
@@ -145,23 +147,23 @@ function Chain(chain){
 					test.style.color = '#000000';  
 					dev.style.color = '#000000'; 
 					alert(response['endpoint']);
-					
+					document.getElementById("walletBalance").innerHTML = 0;
 				}else if(response['endpoint'] == 'Connection Error Testnet'){
 					main.style.color = '#000000'; 
 					test.style.color = '#FF0000';  
 					dev.style.color = '#000000';
 					alert(response['endpoint']);
-					
+					document.getElementById("walletBalance").innerHTML = 0;
 				}else if(response['endpoint'] == 'Connection Error Devnet'){
 					main.style.color = '#000000'; 
 					test.style.color = '#000000';  
 					dev.style.color = '#FF0000';
 					alert(response['endpoint']);
-					
+					document.getElementById("walletBalance").innerHTML = 0;
 				
 				}else{
 					console.log(response['endpoint']);
-					
+					BalanceShow()
 					if(chain == 'Mainnet'){
 						main.style.color = '#6bf2b3'; 
 						test.style.color = '#000000';  
@@ -180,4 +182,18 @@ function Chain(chain){
 });
 	
 	
+}
+
+function BalanceShow(){
+	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "Balance/",
+   data: {},
+   success: function callback(response){
+	document.getElementById("walletBalance").innerHTML = response['bal'];
+	
+   }
+});
 }

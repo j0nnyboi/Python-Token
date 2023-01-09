@@ -74,7 +74,9 @@
 		{% csrf_token %}
         <a onclick = "WalletCheck()" id="WalletBtn" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1" rel="nofollow" value="Wallet Connect" >Wallet Connect</a>
        {% include "WalletPopup.html" %}
-	  </div></header>
+	  </div>
+	  <h4 id='walletBalance'></h4><h4>Safe</h4> 
+	  </header>
 
 	 {% include "home.html" %}
 	 {% include "Token.html" %}

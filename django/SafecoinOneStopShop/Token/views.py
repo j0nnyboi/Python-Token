@@ -39,3 +39,6 @@ def ChangeChain(request):
     endpoint = ST.ChangeEndpoint(chain)
     print('endpoint : ',endpoint)
     return JsonResponse({'endpoint':endpoint})
+def Balance(request):
+    (bal, SafeValue, BWorth) = ST.Balance()
+    return JsonResponse({'bal':bal,'SafeValue':SafeValue,'BWorth':BWorth})

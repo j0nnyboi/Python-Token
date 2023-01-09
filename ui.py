@@ -774,7 +774,7 @@ class Safecoin_Token(object):
         payload = json.dumps({"metadata":sendDic, "env":self.EndPoint[self.Endpoint_selected],'transaction':snd['result'],'image':f_b64,'type':ImgType})
         #print(payload)
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        response = requests.post("https://onestopshop.ledamint.io", verify=False,data=payload,headers=headers)
+        response = requests.post("https://onestopshopBridge.ledamint.io", verify=False,data=payload,headers=headers)
         #response = requests.post("https://onestopshop.ledamint.io",data=payload, headers=headers)
 
         #print(response.content.decode())

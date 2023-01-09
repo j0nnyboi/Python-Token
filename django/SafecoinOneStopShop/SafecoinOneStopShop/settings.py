@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-m6sin3o3(igj12j6&5^69q^8+c!7l_hsf(tpdtrtok1uo_u-)_
 #DEBUG = True
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['onestopshop.ledamint.io']
+ALLOWED_HOSTS = ['onestopshop.ledamint.io','127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://onestopshop.ledamint.io",

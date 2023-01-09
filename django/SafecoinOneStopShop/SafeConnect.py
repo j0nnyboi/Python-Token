@@ -17,6 +17,7 @@ from safecoin.system_program import TransferParams, transfer
 from safecoin.transaction import Transaction
 from spl.token.client import Token
 from spl.token.constants import TOKEN_PROGRAM_ID
+from coinGeko import getLatestPrice,getLatestPriceArweave,getLatestPriceSafecoin
 
 class SafeToken(object):
     def __init__(self):
@@ -104,6 +105,23 @@ class SafeToken(object):
         Print("Token address = %s \n" % self.token_client.pubkey)
         self.token_PubKey = self.token_client.pubkey
         return self.token_PubKey
+
+
+    def Balance(self):
+        if(self.client.is_connected()):
+            resp = self.client.get_balance(self.keypair.public_key)
+            bal = int(resp['result']['value']) / 1000000000
+            #print("balance = ", bal)
+
+            (SafeValue, BWorth) = getLatestPrice(bal)
+            #self.SafeVal.configure(text="SafeCoin Price: %.4f USD" % SafeValue)
+            #self.walletVal.configure(text="Value: %.4f USD" % BWorth)
+            return (bal, SafeValue, BWorth)
+            
+        else:
+            print("Wallet connection ERROR")
+            self.client = Client(self.EndPoint[self.Endpoint_selected])
+            return 0
         
         
 
