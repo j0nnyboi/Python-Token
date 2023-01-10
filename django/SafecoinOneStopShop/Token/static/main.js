@@ -41,6 +41,10 @@ function CreateWallet() {
 			   var btn = document.getElementById("WalletBtn");
 					btn.innerText=response['pubkey'];
 				BalanceShow()
+				var NFTbtn = document.getElementById("NFTbtn");
+				var TKbtn = document.getElementById("TKbtn");
+				TKbtn.style.display = "block";
+			   NFTbtn.style.display = "block";
             }
 });
   
