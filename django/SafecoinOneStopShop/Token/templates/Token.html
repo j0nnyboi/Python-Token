@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 
 	<body class="u-body u-xl-mode" data-lang="en">
-    <section class="u-clearfix u-section-1" id="sec-33e8">
+    <section class="u-clearfix u-section-1" id="sec-33e8" hidden="hidden">
 	<form method="POST">    
 	{% csrf_token %}
       <div class="u-clearfix u-sheet u-sheet-1">
         <a onclick = "NewToken()"class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1">Create Token</a>
         <h6 class="u-text u-text-default u-text-1">OR</h6>
-        <p class="u-text u-text-default u-text-2">Please Place Token Pubkey Here</p>
-        <a href="https://nicepage.com/website-builder" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-2">Load Token</a>
+        <input class="u-text u-text-default u-text-2" id="TokenLoadStr" placeholder="Please Place Token Pubkey Here">
+        <a onclick="LoadTokenKey()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-2">Load Token</a>
       </div>
 	 </form>
     </section>

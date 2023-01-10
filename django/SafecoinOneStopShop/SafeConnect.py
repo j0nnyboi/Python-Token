@@ -106,6 +106,36 @@ class SafeToken(object):
         self.token_PubKey = self.token_client.pubkey
         return self.token_PubKey
 
+    def LoadToken(self,TokenPubKey):
+        self.token_PubKey = TokenPubKey
+        return self.token_PubKey
+
+
+    def NewTokenACC(self):
+        self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
+        print(self.token_PubKey)
+        
+        self.token_Account = self.TokenACCOUNT.create_associated_token_account(self.token_PubKey,skip_confirmation = True)
+        print(self.token_Account)
+        resp = self.client.get_account_info(self.token_Account)
+        amount = 0
+        while resp["result"]["value"] == None:
+                print(resp)
+                resp = self.client.get_account_info(self.token_Account)
+                time.sleep(1)
+                amount += 1
+                if(amount > 100):
+                    return
+        print(resp)
+        print(self.token_Account)
+        return (self.token_Account,self.token_PubKey)
+
+    def LoadTokenACC(self,TokenAccPubKey):
+        self.token_Account = TokenAccPubKey
+        self.TokenACCOUNT = Token(conn=self.client,pubkey=self.token_PubKey,program_id=TOKEN_PROGRAM_ID,payer=self.keypair)
+        return (self.token_Account,self.token_PubKey)
+        
+
 
     def Balance(self):
         if(self.client.is_connected()):
@@ -123,6 +153,27 @@ class SafeToken(object):
             self.client = Client(self.EndPoint[self.Endpoint_selected])
             return 0
         
+
+    def TKNBal(self):
+        TokenBall = self.TokenACCOUNT.get_balance(pubkey=self.token_Account)
+        #print(TokenBall)
+        try:
+            bal = int(TokenBall['result']['value']['uiAmount'])
+            return bal
+        except:
+            return 0 
+        
+    def MintToken(self, amount = 10):
+            resp = self.TokenACCOUNT.mint_to(
+                dest=self.token_Account,
+                mint_authority=self.keypair,
+                amount=amount * 1000000,
+            )
+            print(resp)
+            gotTX = self.await_TXN_full_confirmation(self.client,resp['result'])
+            return amount
+
+
     def await_TXN_full_confirmation(self,client, txn, max_timeout=60):
         if txn is None:
             return False
@@ -154,8 +205,4 @@ class SafeToken(object):
         else:
             print("not connected to %s"%self.api_endpoint)
             return None
-        
-
-    
-
         

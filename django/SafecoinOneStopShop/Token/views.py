@@ -8,9 +8,6 @@ def index(request):
     #print(request.POST)
     return render(request, "index.html")
 
-def WalletPopup(request):
-    pass
-
 
     
 def Wallet(request):
@@ -32,6 +29,18 @@ def NewToken(request):
     TokenPubKey = ST.NewToken()
     return HttpResponse(str(TokenPubKey))
 
+def loadToken(request):
+    TokenPubKey = ST.LoadToken(request.POST.get("Token", None))
+    return HttpResponse(str(TokenPubKey))
+    
+def NewTokenAcc(request):
+    (TokenACCPubKey,TokenPubKey) = ST.NewTokenACC()
+    return JsonResponse({'tokenAcc':str(TokenACCPubKey),'Token':str(TokenPubKey)})
+
+def loadTokenAcc(request):
+    (TokenACCPubKey,TokenPubKey) = ST.LoadTokenACC(request.POST.get("Token", None))
+    return JsonResponse({'tokenAcc':str(TokenACCPubKey),'Token':str(TokenPubKey)})
+    
 
 def ChangeChain(request):
     chain = request.POST.get("chain", None)
@@ -39,6 +48,7 @@ def ChangeChain(request):
     endpoint = ST.ChangeEndpoint(chain)
     print('endpoint : ',endpoint)
     return JsonResponse({'endpoint':endpoint})
+
 def Balance(request):
     (bal, SafeValue, BWorth) = ST.Balance()
     return JsonResponse({'bal':bal,'SafeValue':SafeValue,'BWorth':BWorth})
@@ -46,3 +56,17 @@ def Balance(request):
 def airdrop(request):
     tx = ST.airdrop()
     return HttpResponse(tx)
+
+def TKNBal(request):
+    bal = ST.TKNBal()
+    return JsonResponse({'TKbal':bal})
+
+def TKMint(request):
+    try:
+        amt = int(request.POST.get("amaount", ""))
+    except:
+        return HttpResponse("no mint amount")
+    print(amt)
+    mnt = ST.MintToken(amt)
+    print(mnt)
+    return HttpResponse(mnt)

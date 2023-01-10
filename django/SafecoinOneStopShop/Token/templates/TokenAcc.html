@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 
-    <section class="u-clearfix u-white u-section-1" id="sec-57bf">
+
+	<body class="u-body u-xl-mode" data-lang="en">
+    <section class="u-clearfix u-white u-section-1" id="sec-57bf" hidden="hidden">
+      <form method="POST">    
+	{% csrf_token %}
       <div class="u-clearfix u-sheet u-sheet-1">
-        <a href="http://127.0.0.1:8000/Token" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1">Create Token Account</a>
+        <a onclick = "NewTokenACC()"class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1">Create Token Account</a>
         <h6 class="u-text u-text-default u-text-1">OR</h6>
-        <p class="u-text u-text-default u-text-2">Please Place Token Account Pubkey Here</p>
-        <a href="https://nicepage.com/website-builder" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-2">Load Token Account</a>
+        <input class="u-text u-text-default u-text-2" id="TokenACCLoadStr" placeholder="Please Place Token Account Pubkey Here">
+        <a onclick="LoadTokenACC()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-2">Load Token Account</a>
       </div>
+	 </form>
     </section>
     
     
   
-</body></html>

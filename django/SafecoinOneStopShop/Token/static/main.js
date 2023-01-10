@@ -1,18 +1,21 @@
 
-var Token = document.getElementById("sec-33e8");
-Token.style.display = "none";
-var NFT = document.getElementById("sec-353e");
-NFT.style.display = "none";
+//8uBRV4zUk7ukxxSnnkpm5jqu7hWNSTYgWqPpvf37owMc
+//GZfWdsbhYsoSXe3MT2j3mtmmKShe6gjZaYrZ25LAN2kW
+
+
 var Airbtn = document.getElementById("Airdropbtn");
 Airbtn.style.display = "none";
+var NFTbtn = document.getElementById("NFTbtn");
+NFTbtn.style.display = "none";
+var TKbtn = document.getElementById("TKbtn");
+TKbtn.style.display = "none";
+
+var Hbtn = document.getElementById("Hombtn");
+Hbtn.style.color = '#000000';
 
 function WalletCheck(){
 if(!localStorage.getItem('Keypair')) {
 	$("#walletpopup").show();
-	console.log('wallet popup');
-  //popupWindow = window.open(
-//		'WalletPopup/','popUpWindow','height=300,width=400,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
-  //populateKeypair();
 } else {
   setKeypair();
   
@@ -57,7 +60,9 @@ function ImportWallet(){
 
 
 function setKeypair() {
-  var currentKey = localStorage.getItem('Keypair');/*get client stored keypair*/
+	var NFTbtn = document.getElementById("NFTbtn");
+	var TKbtn = document.getElementById("TKbtn");
+	var currentKey = localStorage.getItem('Keypair');/*get client stored keypair*/
   console.log(currentKey)
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
  $.ajax({
@@ -70,6 +75,8 @@ function setKeypair() {
 			   var btn = document.getElementById("WalletBtn");
 			   btn.innerText=response;
 			   //document.getElementById("WalletBtn").value=response;
+			   TKbtn.style.display = "block";
+			   NFTbtn.style.display = "block";
 			   BalanceShow()
             }
 });
@@ -83,6 +90,16 @@ function HomePage(){
 	Token.style.display = "none";
 	var NFT = document.getElementById("sec-353e");
 	NFT.style.display = "none";
+	var TokenAcc = document.getElementById("sec-57bf");
+    TokenAcc.style.display = "none";
+	var TokenEdit = document.getElementById("sec-47c3");
+    TokenEdit.style.display = "none";
+	var NFTbtn = document.getElementById("NFTbtn");
+	NFTbtn.style.color = '#000000';
+	var TKbtn = document.getElementById("TKbtn");
+	TKbtn.style.color = '#000000';
+	var Hbtn = document.getElementById("Hbtn");
+	Hbtn.style.color = '#6bf2b3';
 	
 }
 function TokenPage(){
@@ -92,6 +109,16 @@ function TokenPage(){
 	Token.style.display = "block";
 	var NFT = document.getElementById("sec-353e");
 	NFT.style.display = "none";
+	var TokenAcc = document.getElementById("sec-57bf");
+    TokenAcc.style.display = "none";
+	var TokenEdit = document.getElementById("sec-47c3");
+    TokenEdit.style.display = "none";
+	var NFTbtn = document.getElementById("NFTbtn");
+	NFTbtn.style.color = '#000000';
+	var TKbtn = document.getElementById("TKbtn");
+	TKbtn.style.color = '#6bf2b3';
+	var Hbtn = document.getElementById("Hbtn");
+	Hbtn.style.color = '#000000';
 	
 }
 function NFTPage(){
@@ -101,10 +128,46 @@ function NFTPage(){
 	Token.style.display = "none";
 	var NFT = document.getElementById("sec-353e");
 	NFT.style.display = "block";
-	console.log('NFT');
+	var TokenAcc = document.getElementById("sec-57bf");
+    TokenAcc.style.display = "none";
+	var TokenEdit = document.getElementById("sec-47c3");
+    TokenEdit.style.display = "none";
+	var NFTbtn = document.getElementById("NFTbtn");
+	NFTbtn.style.color = '#6bf2b3';
+	var TKbtn = document.getElementById("TKbtn");
+	TKbtn.style.color = '#000000';
+	var Hbtn = document.getElementById("Hbtn");
+	Hbtn.style.color = '#000000';
 	
 }
 
+function TKNAccPage(){
+	var Home = document.getElementById("sec-fb3f");
+	Home.style.display = "none";
+	var Token = document.getElementById("sec-33e8");
+	Token.style.display = "none";
+	var NFT = document.getElementById("sec-353e");
+	NFT.style.display = "none";
+	var TokenAcc = document.getElementById("sec-57bf");
+    TokenAcc.style.display = "block";
+	var TokenEdit = document.getElementById("sec-47c3");
+    TokenEdit.style.display = "none";
+	
+}
+function TKNEditPage(Keys){
+	var Home = document.getElementById("sec-fb3f");
+	Home.style.display = "none";
+	var Token = document.getElementById("sec-33e8");
+	Token.style.display = "none";
+	var NFT = document.getElementById("sec-353e");
+	NFT.style.display = "none";
+	var TokenAcc = document.getElementById("sec-57bf");
+    TokenAcc.style.display = "none";
+	var TokenEdit = document.getElementById("sec-47c3");
+    TokenEdit.style.display = "block";
+	console.log('keys : '+ Keys['Token'] + ' ' + Keys['tokenAcc'])
+	
+}
 
 var main = document.getElementById('Mainnet');
 var test = document.getElementById('Testnet');
@@ -192,6 +255,9 @@ function BalanceShow(){
 }
 
 function Airdrop(){
+	
+	var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
 	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   $.ajax({
 	  headers: {'X-CSRFToken': csrftoken},
@@ -200,7 +266,10 @@ function Airdrop(){
    data: {},
    success: function callback(response){
 	   console.log(response)
-	  alert('Airdrop tx : ' + response);
+	   
+	   Loading.style.display = "none";
+	   
+	  //alert('Airdrop tx : ' + response);
 	  BalanceShow()
    }
 });
@@ -209,6 +278,8 @@ function Airdrop(){
 
 function NewToken() {
   /*get new key and save client side*/
+  var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   $.ajax({
 	  headers: {'X-CSRFToken': csrftoken},
@@ -217,11 +288,110 @@ function NewToken() {
    data: {},
    success: function callback(response){
                console.log(response);
+			   Loading.style.display = "none";
 			   alert('Token PubKey : ' + response);
+			   TKNAccPage()
 			   //var btn = document.getElementById("WalletBtn");
 			   //btn.innerText=response;
 			   //document.getElementById("WalletBtn").value=;
             }
 });
+}
 
+function LoadTokenKey(){
+	const TokenPubkey = document.getElementById('TokenLoadStr').value;
+	//console.log(val);
+	var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "loadToken/",
+   data: {'Token':TokenPubkey},
+   success: function callback(response){
+		Loading.style.display = "none";
+		console.log(response);
+		TKNAccPage()
+   }
+});
+}
+
+function NewTokenACC() {
+  /*get new key and save client side*/
+  var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "GET",
+   url: "NewTokenAcc/",
+   data: {},
+   success: function callback(response){
+               console.log(response);
+			   Loading.style.display = "none";
+			   alert('Token Account PubKey : ' + response['tokenAcc']);
+			   TKNEditPage(response)
+			   //var btn = document.getElementById("WalletBtn");
+			   //btn.innerText=response;
+			   //document.getElementById("WalletBtn").value=;
+            }
+});
+}
+
+function LoadTokenACC(){
+	const TokenPubkey = document.getElementById('TokenACCLoadStr').value;
+	//console.log(val);
+	var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "loadTokenAcc/",
+   data: {'Token':TokenPubkey},
+   success: function callback(response){
+		Loading.style.display = "none";
+		console.log(response['tokenAcc']);
+		TKNEditPage(response);
+   }
+});
+}
+
+function TKNBal(){
+	//console.log(val);
+	var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "TKNBal/",
+   data: {},
+   success: function callback(response){
+		Loading.style.display = "none";
+		console.log(response);
+		document.getElementById("TNKBallanceLB").innerHTML = response['TKbal'];
+   }
+});
+}
+
+function TKMint(){
+	//console.log(val);
+	const TKNamount = document.getElementById('MintAmmt').value;
+	var Loading = document.getElementById('loadingSpin');
+	Loading.style.display = "block";
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "TKMint/",
+   data: {'amaount':TKNamount},
+   success: function callback(response){
+		Loading.style.display = "none";
+		console.log(response);
+		BalanceShow();
+		TKNBal();
+   }
+});
 }
