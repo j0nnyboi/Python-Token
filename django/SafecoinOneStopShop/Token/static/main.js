@@ -9,6 +9,9 @@ var NFTbtn = document.getElementById("NFTbtn");
 NFTbtn.style.display = "none";
 var TKbtn = document.getElementById("TKbtn");
 TKbtn.style.display = "none";
+var Chainbtn = document.getElementById("ChainSelectionbtn");
+Chainbtn.style.display = "none";
+
 
 var Hbtn = document.getElementById("Hombtn");
 Hbtn.style.color = '#000000';
@@ -45,6 +48,8 @@ function CreateWallet() {
 				var TKbtn = document.getElementById("TKbtn");
 				TKbtn.style.display = "block";
 			   NFTbtn.style.display = "block";
+			   var Chainbtn = document.getElementById("ChainSelectionbtn");
+				Chainbtn.style.display = "block";
             }
 });
   
@@ -81,6 +86,8 @@ function setKeypair() {
 			   //document.getElementById("WalletBtn").value=response;
 			   TKbtn.style.display = "block";
 			   NFTbtn.style.display = "block";
+			   var Chainbtn = document.getElementById("ChainSelectionbtn");
+				Chainbtn.style.display = "block";
 			   BalanceShow()
             }
 });
@@ -96,7 +103,7 @@ function HomePage(){
 	NFT.style.display = "none";
 	var TokenAcc = document.getElementById("sec-57bf");
     TokenAcc.style.display = "none";
-	var TokenEdit = document.getElementById("sec-47c3");
+	var TokenEdit = document.getElementById("sec-6518");
     TokenEdit.style.display = "none";
 	var NFTbtn = document.getElementById("NFTbtn");
 	NFTbtn.style.color = '#000000';
@@ -115,7 +122,7 @@ function TokenPage(){
 	NFT.style.display = "none";
 	var TokenAcc = document.getElementById("sec-57bf");
     TokenAcc.style.display = "none";
-	var TokenEdit = document.getElementById("sec-47c3");
+	var TokenEdit = document.getElementById("sec-6518");
     TokenEdit.style.display = "none";
 	var NFTbtn = document.getElementById("NFTbtn");
 	NFTbtn.style.color = '#000000';
@@ -134,7 +141,7 @@ function NFTPage(){
 	NFT.style.display = "block";
 	var TokenAcc = document.getElementById("sec-57bf");
     TokenAcc.style.display = "none";
-	var TokenEdit = document.getElementById("sec-47c3");
+	var TokenEdit = document.getElementById("sec-6518");
     TokenEdit.style.display = "none";
 	var NFTbtn = document.getElementById("NFTbtn");
 	NFTbtn.style.color = '#6bf2b3';
@@ -154,7 +161,7 @@ function TKNAccPage(){
 	NFT.style.display = "none";
 	var TokenAcc = document.getElementById("sec-57bf");
     TokenAcc.style.display = "block";
-	var TokenEdit = document.getElementById("sec-47c3");
+	var TokenEdit = document.getElementById("sec-6518");
     TokenEdit.style.display = "none";
 	
 }
@@ -167,8 +174,10 @@ function TKNEditPage(Keys){
 	NFT.style.display = "none";
 	var TokenAcc = document.getElementById("sec-57bf");
     TokenAcc.style.display = "none";
-	var TokenEdit = document.getElementById("sec-47c3");
+	var TokenEdit = document.getElementById("sec-6518");
     TokenEdit.style.display = "block";
+	document.getElementById("TKNacc").innerHTML = Keys['tokenAcc'];
+	document.getElementById("TKNToken").innerHTML = Keys['Token']
 	console.log('keys : '+ Keys['Token'] + ' ' + Keys['tokenAcc'])
 	
 }
@@ -335,7 +344,7 @@ function NewTokenACC() {
                console.log(response);
 			   Loading.style.display = "none";
 			   alert('Token Account PubKey : ' + response['tokenAcc']);
-			   TKNEditPage(response)
+				TKNEditPage(response)
 			   //var btn = document.getElementById("WalletBtn");
 			   //btn.innerText=response;
 			   //document.getElementById("WalletBtn").value=;
@@ -355,13 +364,15 @@ function LoadTokenACC(){
    url: "loadTokenAcc/",
    data: {'Token':TokenPubkey},
    success: function callback(response){
-		Loading.style.display = "none";
 		console.log(response['tokenAcc']);
-		TKNEditPage(response);
+		Loading.style.display = "none";
+		TKNEditPage(response);	
+		TKNBal();
    }
 });
 }
-
+//GRcXwocyawfcpZ1Ff3nY3VycrzvpcRJyVa2WBPfXpbyh
+//CXyvCTvfrgYdYNVqApeW4taPtDxp1LNQDktZXfRhr2vr
 function TKNBal(){
 	//console.log(val);
 	var Loading = document.getElementById('loadingSpin');
@@ -375,7 +386,7 @@ function TKNBal(){
    success: function callback(response){
 		Loading.style.display = "none";
 		console.log(response);
-		document.getElementById("TNKBallanceLB").innerHTML = response['TKbal'];
+		document.getElementById("TKNBall").innerHTML = response['TKbal'];
    }
 });
 }
@@ -398,4 +409,8 @@ function TKMint(){
 		TKNBal();
    }
 });
+}
+
+function TKNReg(){
+	
 }

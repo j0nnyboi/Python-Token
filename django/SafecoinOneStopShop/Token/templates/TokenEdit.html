@@ -1,21 +1,51 @@
 <!DOCTYPE html>
 
-
-
-
-    <section class="u-clearfix u-section-1" id="sec-47c3" hidden="hidden">
-      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-	  <h6 class="u-btn-2" id='TNKBallanceLB'></h6>
-        <a onclick="TKNBal()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-1">Token Balance</a>
-        <a onclick="TKMint()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-2">Mint</a>
-        <input class="u-text u-text-default u-text-2" id='MintAmmt' placeholder="Mint Amount">
-        <a onclick="TKNBurn()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-3">Token Burn</a>
-        <input class="u-text u-text-default u-text-3" id='BurnAmmt' placeholder='Burn Amount'>
-        <a onclick="TKNFreeze()" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-4">Token Freeze</a>
-        <a onclick="TKNThaw" class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-hover-palette-1-light-1 u-radius-50 u-btn-5">Token Thaw</a>
+   <body class="u-body u-xl-mode" data-lang="en">
+    <section class="TE u-clearfix u-section-1" hidden='hidden' id="sec-6518">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-container-style u-group u-group-1">
+          <div class="u-container-layout">
+            <h4 class="u-text u-text-default u-text-1">Token Balance:</h4>
+            <h4 class="u-text u-text-default u-text-2">Token Account:</h4>
+            <h4 class="u-text u-text-3" id='TKNBall'>0</h4>
+            <h6 class="u-text u-text-4" id='TKNToken'>-</h6>
+            <h4 class="u-text u-text-default u-text-5">Token:</h4>
+            <h6 class="u-text u-text-6" id='TKNacc'>-</h6>
+          </div>
+        </div>
+        <div class="u-container-style u-group u-group-2">
+          <div class="u-container-layout u-container-layout-2">
+            <a onclick='TKMint()' class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-custom-item u-hover-palette-1-light-1 u-radius-50 u-btn-1">&nbsp; Mint&nbsp;</a>
+            <input class="u-text u-text-default u-text-7" id='MintAmmt' placeholder='Mint Amount'>
+            <a onclick='TKBurn()' class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-custom-item u-hover-palette-1-light-1 u-radius-50 u-btn-2">Burn</a>
+            <input class="u-text u-text-default u-text-8" id='BurnAmmt' placeholder='Burn Amount'>
+            <a onclick='TKFreeze()' class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-custom-item u-hover-palette-1-light-1 u-radius-50 u-btn-3">Freeze</a>
+            <a onclick='TKThaw()' class="u-border-2 u-border-grey-75 u-btn u-btn-round u-button-style u-custom-color-1 u-custom-item u-hover-palette-1-light-1 u-radius-50 u-btn-4">Thaw</a>
+          </div>
+        </div>
+        <div class="TEForm u-border-2 u-border-grey-75 u-form u-form-1">
+          <form action="TokenReg()" class="u-clearfix u-form-spacing-15 u-form-vertical u-inner-form" style="padding: 15px;" source="custom" name="TE-form">
+            <p class="u-align-center u-form-group u-form-text u-label-none u-text u-text-9">Register your Token&nbsp;</p>
+            <div class="u-form-group u-form-name u-label-none u-form-group-2">
+              <label for="name-6797" class="u-label">Token Name</label>
+              <input type="text" placeholder="Token Name" id="name-6797" name="name" class="u-border-1 u-border-grey-30 u-input u-input-rectangle" required="">
+            </div>
+            <div class="u-form-email u-form-group u-label-none u-form-group-3">
+              <label for="email-6797" class="u-label">Token Symble</label>
+              <input type="text" placeholder="Token Symble" id="email-6797" name="Symble" class="u-border-1 u-border-grey-30 u-input u-input-rectangle" required="">
+            </div>
+            <div class="u-form-group u-form-message u-label-none u-form-group-4">
+              <label for="message-6797" class="u-label">Token Description</label>
+              <textarea placeholder="Token Description" rows="4" cols="50" id="message-6797" name="message" class="u-border-1 u-border-grey-30 u-input u-input-rectangle" required=""></textarea>
+            </div>
+            <div class="u-align-left u-form-group u-form-submit u-label-none u-form-group-5">
+              <a href="TKNReg()" class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-hover-palette-1-base u-radius-50 u-btn-5">Submit</a>
+              <input type="submit" value="submit" class="u-form-control-hidden">
+            </div>
+          </form>
+        </div>
       </div>
     </section>
-    
     
 
   
