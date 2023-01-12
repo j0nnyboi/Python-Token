@@ -11,16 +11,16 @@ var TKbtn = document.getElementById("TKbtn");
 TKbtn.style.display = "none";
 var Chainbtn = document.getElementById("ChainSelectionbtn");
 Chainbtn.style.display = "none";
-
-
 var Hbtn = document.getElementById("Hombtn");
 Hbtn.style.color = '#000000';
 
 function WalletCheck(){
 if(!localStorage.getItem('Keypair')) {
 	$("#walletpopup").show();
+	
 } else {
   setKeypair();
+  HomePage();
   
 }
 }
@@ -366,7 +366,8 @@ function LoadTokenACC(){
    success: function callback(response){
 		console.log(response['tokenAcc']);
 		Loading.style.display = "none";
-		TKNEditPage(response);	
+		TKNEditPage(response);
+		BalanceShow();		
 		TKNBal();
    }
 });
@@ -394,7 +395,7 @@ function TKNBal(){
 function TKMint(){
 	//console.log(val);
 	const TKNamount = document.getElementById('MintAmmt').value;
-	var Loading = document.getElementById('loadingSpin');
+	var Loading = document.getElementById('lo1adingSpin');
 	Loading.style.display = "block";
 	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   $.ajax({
@@ -411,6 +412,31 @@ function TKMint(){
 });
 }
 
-function TKNReg(){
+
+function Tokenreg(){
+	//console.log(val);
 	
+	var Loading = document.getElementById('loadingSpin');
+	//Loading.style.display = "block";
+	 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+	 
+	 var Name = document.getElementById('TR_Name').value;
+	var Sym = document.getElementById('TR_Sym').value;
+	var Des = document.getElementById('TR_Des').value;
+	console.log(Name);
+	console.log(Sym);
+	console.log(Des);
+	
+	var File = document.getElementById('file').file;
+	
+  $.ajax({
+	  headers: {'X-CSRFToken': csrftoken},
+   type: "POST",
+   url: "TokenReg/",
+   data: {"name": Name,"Symble": Sym,"message": Des, 'File':File},
+   success: function callback(response){
+		Loading.style.display = "none";
+		console.log(response);
+   }
+});
 }

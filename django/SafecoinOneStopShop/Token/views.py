@@ -70,3 +70,19 @@ def TKMint(request):
     mnt = ST.MintToken(amt)
     print(mnt)
     return HttpResponse(mnt)
+
+
+def TokenReg(request):
+    TR_Name = request.POST.get("name")
+    TR_Sym = request.POST.get('Symble')
+    TR_Des = request.POST.get('message')
+    TR_File = request.POST.get('File')
+    print(request.POST)
+    #print(TR_File.size)
+    #print(TR_File.content_type)
+    print(TR_Name)
+    print(TR_Sym)
+    print(TR_Des)
+    #res = ST.Tokenreg(TR_Name,TR_Sym,TR_Des,TR_File)
+    res = 0
+    return JsonResponse({'response':res})

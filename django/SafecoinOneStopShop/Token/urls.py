@@ -15,4 +15,5 @@ urlpatterns = [
     path('Airdrop/', views.airdrop, name='airdrop'),
     path('TKNBal/', views.TKNBal, name='TKNBal'),
     path('TKMint/', views.TKMint, name='TKMint'),
+    path('TokenReg/', views.TokenReg, name='TokenReg'),
 ]

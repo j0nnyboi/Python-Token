@@ -18,6 +18,9 @@ from safecoin.transaction import Transaction
 from spl.token.client import Token
 from spl.token.constants import TOKEN_PROGRAM_ID
 from coinGeko import getLatestPrice,getLatestPriceArweave,getLatestPriceSafecoin
+import requests
+import arweave
+from arweave.utils import winston_to_ar
 
 class SafeToken(object):
     def __init__(self):
@@ -28,6 +31,7 @@ class SafeToken(object):
         self.Endpoint_selected = 'Mainnet'
         self.keypair = ""
         self.wallet_connected = False
+        self.client = Client(self.EndPoint[self.Endpoint_selected])
 
     def ChangeEndpoint(self,endpoint):
         #print("Endpoint Changed: ",endpoint)
@@ -205,4 +209,86 @@ class SafeToken(object):
         else:
             print("not connected to %s"%self.api_endpoint)
             return None
+
+
+    def Tokenreg(self,TokenName,TokenTicker,TokenDSK,TR_File):
+
+
+        arweavePrice = getLatestPriceArweave()
+        SafecoinPrice = getLatestPriceSafecoin()
+        exchangeRate = arweavePrice / SafecoinPrice
+        AR_FEE_MULTIPLIER = 20 / 100
         
+            
+        f_bytes = TR_File.read()
+        f_b64 = base64.b64encode(f_bytes).decode("utf8")
+
+
+        API_URL = "https://arweave.net"
+        url = "{}/price/{}".format(API_URL, TR_File.size)
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+             #print("Cost in winston %s " % response.text)
+             TokenimgCost = winston_to_ar(response.text)
+        else:
+            return 'unable to get AR costs'
+        #print("TokenCost %s" % TokenimgCost)
+        print("SafeAmount exact %s" % (exchangeRate * TokenimgCost))
+        Safeamount = ((TokenimgCost * exchangeRate) * 20)
+        print("SafeAmount %s" %Safeamount)
+        
+        #workout amount and send safecoin to es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc so it can be converted to arweave
+
+        txn = Transaction().add(transfer(TransferParams(from_pubkey=self.keypair.public_key, to_pubkey='es7DKe3NyR1u8MJNuv6QV6rbhmZQkyYUpgKpGJNuTTc', lamports=int(Safeamount * 1000000000))))
+        snd = self.client.send_transaction(txn, self.keypair)
+        print(snd)
+        gotTX = self.await_TXN_full_confirmation(self.client,snd['result'])
+        if(gotTX):
+            pass       
+        else:
+            return 'Sending safecoin to cover AR conversion failed'
+           
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+   
+        tokenMetadata = { "name": TokenName,"symbol": TokenTicker,"description": TokenDSK,"image": ""}
+        sendDic = {"name": TokenName,
+                "symbol": TokenTicker,
+                "description": TokenDSK,
+                "image": "",
+                "updateAuthority": str(self.keypair.public_key),
+                "mint": str(self.token_PubKey),
+                "mintAuthority": str(self.keypair.public_key),
+                "sellerFeeBasisPoints": 0,
+                "creators": None,
+                "collection": None,
+                "uses": None}
+        
+        payload = json.dumps({"metadata":sendDic, "env":self.EndPoint[self.Endpoint_selected],'transaction':snd['result'],'image':f_b64,'type':TR_File.content_type})
+        #print(payload)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        response = requests.post("https://onestopshopBridge.ledamint.io", verify=False,data=payload,headers=headers)
+        #response = requests.post("https://onestopshop.ledamint.io",data=payload, headers=headers)
+
+        #print(response.content.decode())
+        res = (json.loads(response.text.split('\r\n\r\n')[1])['MetaLink'])
+        
+        if(res == 'ERROR'):
+            return 'Sending safecoin to cover AR conversion failed'
+        
+
+        cfg = {
+            "PRIVATE_KEY": base58.b58encode(self.keypair.seed).decode("ascii"),
+            "PUBLIC_KEY": str(self.keypair.public_key),
+            "DECRYPTION_KEY": Fernet.generate_key().decode("ascii"),
+        }
+        #print(cfg)
+        """
+        api = LedamintAPI(cfg)
+        result = api.deploy(self.EndPoint[self.Endpoint_selected], TokenName, TokenTicker,0)
+        contract_key = json.loads(result).get('contract')
+        # conduct a mint, and send to a recipient, e.g. wallet_2
+        mint_res = api.mint(self.EndPoint[self.Endpoint_selected], contract_key, self.token_Account, res)
+        """
+        return res #arwave link    
