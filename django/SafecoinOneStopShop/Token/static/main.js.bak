@@ -428,14 +428,12 @@ function Tokenreg(){
 	console.log(Des);
 	var filename = $("#file").val();
 	//var File = document.getElementById('file').file;
-	let photo = document.getElementById("file").files[0];
-	let formData = new FormData();
-	formData.append("photo", photo);
+	
   $.ajax({
 	  headers: {'X-CSRFToken': csrftoken},
    type: "POST",
    url: "TokenReg/",
-   data: {"name": Name,"Symble": Sym,"message": Des, 'File':formData},
+   data: {"name": Name,"Symble": Sym,"message": Des, 'File':filename},
    success: function callback(response){
 		Loading.style.display = "none";
 		console.log(response);
